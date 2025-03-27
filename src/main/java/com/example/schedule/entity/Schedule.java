@@ -1,11 +1,14 @@
 package com.example.schedule.entity;
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import lombok.Getter;
+import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "schedule")
-public class schedule extends base{
+@Table(name = "Schedule")
+@Getter
+@Setter
+public class Schedule extends Base {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,9 +21,9 @@ public class schedule extends base{
     String plan;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "schedule_comment")
-    List<comment> comments;
+    List<Comment> Comments;
 
     @ManyToOne
     @JoinColumn(name = "userId")
-    user schedule_user;
+    User schedule_user;
 }

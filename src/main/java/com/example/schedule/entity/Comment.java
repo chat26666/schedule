@@ -1,14 +1,16 @@
 package com.example.schedule.entity;
 import jakarta.persistence.*;
-
-import java.time.LocalDate;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Table(name = "comment")
-public class comment extends base {
+@Table(name = "Comment")
+@Getter
+@Setter
+public class Comment extends Base {
 
     @Id
-    @GeneratedValue(GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     long commentId;
 
     @Column(length = 55, nullable = false)
@@ -16,10 +18,10 @@ public class comment extends base {
 
     @ManyToOne
     @JoinColumn(name = "userId")
-    user comment_user;
+    User comment_user;
 
     @ManyToOne
     @JoinColumn(name = "scheduleId")
-    schedule schedule_comment;
+    Schedule schedule_comment;
 
 }
