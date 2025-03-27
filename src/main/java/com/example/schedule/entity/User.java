@@ -2,30 +2,32 @@ package com.example.schedule.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import java.util.List;
 
 @Entity
 @Table(name = "User")
 @Getter
 @Setter
+@Accessors(chain = true)
 public class User extends Base {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long userId;
+    private Long userId;
 
     @Column(length = 40, nullable = false)
-    String name;
+    private String name;
 
     @Column(length = 70, nullable = false, unique = true)
-    String email;
+    private String email;
 
     @Column(length = 100, nullable = false)
-    String password;
+    private String password;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "comment_user")
-    List<Comment> Comments;
+    private List<Comment> Comments;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "schedule_user")
-    List<Schedule> Schedules;
+    private List<Schedule> Schedules;
 }

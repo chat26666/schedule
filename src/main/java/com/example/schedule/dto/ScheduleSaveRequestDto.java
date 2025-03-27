@@ -7,8 +7,8 @@ import lombok.AllArgsConstructor;
 public class ScheduleSaveRequestDto {
     @NotBlank(message = "제목은 필수 입력값입니다.")
     @Size(max = 40, message = "제목은 최대 40글자가 넘지 않도록 해주세요.")
-    String title;
+    private String title;
     @Size(max = 200, message = "일정은 최대 200글자가 넘지 않도록 해주세요.")
     @NotBlank(message = "일정은 필수 입력값입니다.")
-    String plan;
+    private String plan;
 }
