@@ -1,17 +1,20 @@
 package com.example.schedule.service;
 import com.example.schedule.UserSaveRequestDto;
 import com.example.schedule.config.PasswordEncoder;
-import com.example.schedule.dto.ScheduleResponseDto;
-import com.example.schedule.dto.ScheduleSaveRequestDto;
+import com.example.schedule.dto.UserLoginRequestDto;
 import com.example.schedule.entity.User;
 import com.example.schedule.repository.CommentRepository;
 import com.example.schedule.repository.ScheduleRepository;
 import com.example.schedule.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +33,10 @@ public class JpaCommonEntityService implements CommonEntityService {
                                .setPassword(passwordEncoder.encode(dto.getPassword()));
         Long userId = userRepo.save(user).getUserId();
         return Map.of("userId", userId);
+    }
+    public void loginUser(UserLoginRequestDto dto) {
+        User user = userRepo.findById(dto.getUserId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "계정이 틀렸습니다"));
+        if(!passwordEncoder.matches(dto.getPassword(),user.getPassword())) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 틀렸습니다.");
     }
 
 }
