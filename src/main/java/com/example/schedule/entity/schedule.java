@@ -5,7 +5,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "schedule")
-public class schedule {
+public class schedule extends base{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,12 +16,6 @@ public class schedule {
 
     @Column(length = 200, nullable = false)
     String plan;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    LocalDate createdAt;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    LocalDate updatedAt;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "schedule_comment")
     List<comment> comments;

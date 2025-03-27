@@ -5,7 +5,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "user")
-public class user {
+public class user extends base {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,12 +19,6 @@ public class user {
 
     @Column(length = 100, nullable = false)
     String password;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    LocalDate createdAt;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    LocalDate updatedAt;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "schedule_user")
     List<comment> comments;

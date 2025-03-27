@@ -5,7 +5,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "comment")
-public class comment {
+public class comment extends base {
 
     @Id
     @GeneratedValue(GenerationType.IDENTITY)
@@ -21,11 +21,5 @@ public class comment {
     @ManyToOne
     @JoinColumn(name = "scheduleId")
     schedule schedule_comment;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    LocalDate createdAt;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    LocalDate updatedAt;
 
 }
