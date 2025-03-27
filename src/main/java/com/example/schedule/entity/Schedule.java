@@ -12,7 +12,7 @@ public class Schedule extends Base {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long scheduleId;
+    Long scheduleId;
 
     @Column(length = 40, nullable = false)
     String title;

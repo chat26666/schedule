@@ -11,7 +11,7 @@ public class Comment extends Base {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long commentId;
+    Long commentId;
 
     @Column(length = 55, nullable = false)
     String mention;
