@@ -20,7 +20,7 @@ public class UserController {
     private final CommonEntityService commonService;
 
     @PostMapping
-    public ResponseEntity<Map<String,Object>> createUser(@RequestBody UserSaveRequestDto dto) {
+    public ResponseEntity<Map<String,Object>> createUser(@RequestBody @Validated UserSaveRequestDto dto) {
         return new ResponseEntity(commonService.createUser(dto), HttpStatus.CREATED);
     }
 }
