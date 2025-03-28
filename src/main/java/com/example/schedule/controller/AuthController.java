@@ -1,8 +1,10 @@
 package com.example.schedule.controller;
+import com.example.schedule.dto.AuthLogin;
 import com.example.schedule.dto.UserAuthRequestDto;
 import com.example.schedule.service.CommonEntityService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,7 @@ public class AuthController {
     private final CommonEntityService commonService;
 
       @PostMapping("/login")
-      public ResponseEntity<Map<String, String>> userLogin(@RequestBody @Validated UserAuthRequestDto dto, HttpServletRequest request) {
+      public ResponseEntity<Map<String, String>> userLogin(@RequestBody @Validated({Default.class, AuthLogin.class}) UserAuthRequestDto dto, HttpServletRequest request) {
 
           if(request.getSession(false) != null) {
               System.out.println(request.getSession(false).getAttribute("userId"));
