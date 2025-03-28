@@ -31,6 +31,10 @@ public class CommentController {
         commonService.deleteComment(SessionHelper.getUserId(session),scheduleId,commentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+    @PutMapping("/{commentId}")
+    public ResponseEntity<CommentResponseDto> modifyComment(@RequestBody CommentSaveRequestDto dto, @PathVariable Long scheduleId, @PathVariable Long commentId , HttpSession session) {
+        return ResponseEntity.status(HttpStatus.OK).body(commonService.modifyComment(dto,SessionHelper.getUserId(session),scheduleId,commentId));
+    }
     @GetMapping
     public ResponseEntity<List<CommentResponseDto>> findScheduleComment(@PathVariable Long scheduleId) {
         return ResponseEntity.status(HttpStatus.OK).body(joinService.findScheduleComment(scheduleId));

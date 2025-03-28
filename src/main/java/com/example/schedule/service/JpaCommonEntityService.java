@@ -112,5 +112,21 @@ public class JpaCommonEntityService implements CommonEntityService {
         user.removeComment(comment);
         commentRepo.deleteById(commentId);
     }
+    @Transactional
+    @Override
+    public CommentResponseDto modifyComment(CommentSaveRequestDto dto,Long userId, Long scheduleId, Long commentId) {
+        Comment comment = commentRepo.findById(commentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 댓글이 존재하지 않습니다."));
+        Long check_userId = comment.getComment_user().getUserId();
+        if (!userId.equals(check_userId)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 댓글의 주인이 아닙니다.");
+        scheduleRepo.findById(scheduleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
+        Long check_scheduleId = comment.getComment_schedule().getScheduleId();
+        if (!scheduleId.equals(check_scheduleId))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 게시글의 댓글이 아닙니다.");
+        comment.setMention(dto.getMention());
+        User user = userRepo.findById(userId).get();
+
+        return modelMapper.map(comment,CommentResponseDto.class).setName(user.getName()).setUserId(user.getUserId());
+    }
+
 
 }

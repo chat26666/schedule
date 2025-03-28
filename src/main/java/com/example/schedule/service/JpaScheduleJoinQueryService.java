@@ -24,6 +24,7 @@ public class JpaScheduleJoinQueryService implements ScheduleJoinQueryService {
     private final ModelMapper modelMapper;
 
     @Transactional
+    @Override
     public List<CommentResponseDto> findScheduleComment(Long scheduleId) {
         scheduleRepo.findById(scheduleId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
         return commentRepo.findByScheduleComment(scheduleId);
