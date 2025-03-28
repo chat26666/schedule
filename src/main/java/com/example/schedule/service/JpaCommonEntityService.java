@@ -1,8 +1,11 @@
 package com.example.schedule.service;
 import com.example.schedule.UserSaveRequestDto;
 import com.example.schedule.config.PasswordEncoder;
+import com.example.schedule.dto.ScheduleResponseDto;
+import com.example.schedule.dto.ScheduleSaveRequestDto;
 import com.example.schedule.dto.UserAuthRequestDto;
 import com.example.schedule.dto.UserResponseDto;
+import com.example.schedule.entity.Schedule;
 import com.example.schedule.entity.User;
 import com.example.schedule.repository.CommentRepository;
 import com.example.schedule.repository.ScheduleRepository;
@@ -19,7 +22,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class JpaCommonEntityService implements CommonEntityService {
-
     private final PasswordEncoder passwordEncoder;
     private final CommentRepository commentRepo;
     private final ScheduleRepository scheduleRepo;
@@ -56,6 +58,16 @@ public class JpaCommonEntityService implements CommonEntityService {
         userRepo.flush();
         //플러시를 안해주면 dto 에 수정시간이 반영되지 않음
         return modelMapper.map(user,UserResponseDto.class);
+    }
+    @Transactional
+    @Override
+    public ScheduleResponseDto createSchedule(ScheduleSaveRequestDto dto, Long userId) {
+        Schedule schedule = modelMapper.map(dto, Schedule.class);
+        User user = userRepo.findById(userId).get();
+        //이미 로그인을 한 세션이기 때문에 null 발생 x
+        user.addSchedule(schedule);
+        return modelMapper.map(scheduleRepo.save(schedule), ScheduleResponseDto.class)
+                          .setName(user.getName());
     }
 
 }

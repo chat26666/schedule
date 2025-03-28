@@ -2,8 +2,8 @@ package com.example.schedule.dto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,5 +16,5 @@ public class ScheduleResponseDto {
     private String plan;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private CommentResponseDto comment;
+    private List<CommentResponseDto> comment;
 }

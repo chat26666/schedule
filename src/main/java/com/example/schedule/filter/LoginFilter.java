@@ -18,7 +18,7 @@ public class LoginFilter implements Filter {
 
         if((!isBlackList(requestURI) && httpRequest.getSession(false) != null) || isBlackList(requestURI))
             chain.doFilter(request,response);
-        else httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "로그인이 필요합니다.");
+        else httpResponse.sendError(511, "로그인이 필요합니다.");
 
 
     }

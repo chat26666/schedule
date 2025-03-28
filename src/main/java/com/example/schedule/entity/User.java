@@ -30,4 +30,10 @@ public class User extends Base {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "schedule_user")
     private List<Schedule> Schedules;
+
+    public void addSchedule(Schedule schedule) {
+        Schedules.add(schedule);
+        schedule.setSchedule_user(this);
+    }
+
 }

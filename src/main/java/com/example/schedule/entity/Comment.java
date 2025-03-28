@@ -3,6 +3,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "Comment")
@@ -20,10 +22,12 @@ public class Comment extends Base {
 
     @ManyToOne
     @JoinColumn(name = "userId")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User comment_user;
 
     @ManyToOne
     @JoinColumn(name = "scheduleId")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Schedule schedule_comment;
 
 }
