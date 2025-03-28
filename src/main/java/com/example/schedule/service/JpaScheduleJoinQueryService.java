@@ -1,6 +1,7 @@
 package com.example.schedule.service;
 import com.example.schedule.dto.CommentResponseDto;
 import com.example.schedule.dto.ScheduleResponseDto;
+import com.example.schedule.entity.Comment;
 import com.example.schedule.entity.Schedule;
 import com.example.schedule.repository.CommentRepository;
 import com.example.schedule.repository.ScheduleRepository;
@@ -11,6 +12,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,6 +31,26 @@ public class JpaScheduleJoinQueryService implements ScheduleJoinQueryService {
     public List<CommentResponseDto> findScheduleComment(Long scheduleId) {
         scheduleRepo.findById(scheduleId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
         return commentRepo.findByScheduleComment(scheduleId);
+    }
+    public List<ScheduleResponseDto> findMySchedule(Long userId) {
+        List<Schedule> scheduleList = scheduleRepo.scheduleFindByUserId(userId);
+        List<ScheduleResponseDto> dtoList = new ArrayList<>();
+        for(Schedule schedule : scheduleList) {
+            ScheduleResponseDto scheduleDto = modelMapper.map(schedule,ScheduleResponseDto.class)
+                                                         .setName(schedule.getSchedule_user().getName())
+                                                         .setComment(new ArrayList<>());
+            List<Comment> commentList = schedule.getComments();
+            if(commentList != null) {
+                for (Comment comment : commentList) {
+                    CommentResponseDto commentDto = modelMapper.map(comment, CommentResponseDto.class)
+                                                               .setName(comment.getComment_user().getName())
+                                                               .setUserId(comment.getComment_user().getUserId());
+                    scheduleDto.getComment().add(commentDto);
+                }
+            }
+            dtoList.add(scheduleDto);
+        }
+        return dtoList;
     }
 
 }

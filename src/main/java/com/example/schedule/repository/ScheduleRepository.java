@@ -3,6 +3,7 @@ import com.example.schedule.dto.ScheduleResponseDto;
 import com.example.schedule.entity.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,7 +11,10 @@ import java.util.List;
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
 
-    //@Query
-    //List<ScheduleResponseDto> scheduleFindByUserId();
-
+    @Query("SELECT DISTINCT s FROM Schedule s " +
+            "JOIN FETCH s.schedule_user u " +
+            "LEFT JOIN FETCH s.Comments c " +
+            "WHERE u.userId = :userId")
+    List<Schedule> scheduleFindByUserId(@Param("userId") Long userId);
+    //lazy 로딩을 피하고자 fetch 로 한꺼번에 전부 데이터를 로딩했습니다
 }
