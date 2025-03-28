@@ -2,6 +2,7 @@ package com.example.schedule.controller;
 import com.example.schedule.dto.CommentResponseDto;
 import com.example.schedule.dto.CommentSaveRequestDto;
 import com.example.schedule.service.CommonEntityService;
+import com.example.schedule.service.ScheduleJoinQueryService;
 import com.example.schedule.util.SessionHelper;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/schedules/{scheduleId}/comments")
 @Validated
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommonEntityService commonService;
+    private final ScheduleJoinQueryService joinService;
 
     @PostMapping
     public ResponseEntity<CommentResponseDto> createComment(@RequestBody @Validated CommentSaveRequestDto dto, @PathVariable Long scheduleId, HttpSession session) {
@@ -26,5 +30,9 @@ public class CommentController {
     public ResponseEntity<Void> deleteComment(@PathVariable Long scheduleId, @PathVariable Long commentId , HttpSession session) {
         commonService.deleteComment(SessionHelper.getUserId(session),scheduleId,commentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    @GetMapping
+    public ResponseEntity<List<CommentResponseDto>> findScheduleComment(@PathVariable Long scheduleId) {
+        return ResponseEntity.status(HttpStatus.OK).body(joinService.findScheduleComment(scheduleId));
     }
 }
