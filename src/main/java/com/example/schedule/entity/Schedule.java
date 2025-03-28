@@ -25,12 +25,21 @@ public class Schedule extends Base {
     @Column(length = 200, nullable = false)
     private String plan;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "schedule_comment")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "comment_schedule")
     private List<Comment> Comments;
 
     @ManyToOne
     @JoinColumn(name = "userId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User schedule_user;
+
+    public void addComment(Comment comment) {
+        Comments.add(comment);
+        comment.setComment_schedule(this);
+    }
+    public void removeComment(Comment comment) {
+        Comments.remove(comment);
+        comment.setComment_schedule(null);
+    }
 
 }

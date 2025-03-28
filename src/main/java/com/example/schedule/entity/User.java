@@ -39,5 +39,14 @@ public class User extends Base {
         Schedules.remove(schedule);
         schedule.setSchedule_user(null);
     }
+    public void addComment(Comment comment) {
+        Comments.add(comment);
+        comment.setComment_user(this);
+    }
+    public void removeComment(Comment comment) {
+        Comments.remove(comment);
+        comment.setComment_user(null);
+    }
+
 
 }

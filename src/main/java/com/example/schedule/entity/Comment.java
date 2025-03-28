@@ -28,6 +28,6 @@ public class Comment extends Base {
     @ManyToOne
     @JoinColumn(name = "scheduleId")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Schedule schedule_comment;
+    private Schedule comment_schedule;
 
 }

@@ -1,10 +1,8 @@
 package com.example.schedule.service;
 import com.example.schedule.UserSaveRequestDto;
 import com.example.schedule.config.PasswordEncoder;
-import com.example.schedule.dto.ScheduleResponseDto;
-import com.example.schedule.dto.ScheduleSaveRequestDto;
-import com.example.schedule.dto.UserAuthRequestDto;
-import com.example.schedule.dto.UserResponseDto;
+import com.example.schedule.dto.*;
+import com.example.schedule.entity.Comment;
 import com.example.schedule.entity.Schedule;
 import com.example.schedule.entity.User;
 import com.example.schedule.repository.CommentRepository;
@@ -71,7 +69,6 @@ public class JpaCommonEntityService implements CommonEntityService {
     public ScheduleResponseDto createSchedule(ScheduleSaveRequestDto dto, Long userId) {
         Schedule schedule = modelMapper.map(dto, Schedule.class);
         User user = userRepo.findById(userId).get();
-        //이미 로그인을 한 세션이기 때문에 null 발생 x
         user.addSchedule(schedule);
         return modelMapper.map(scheduleRepo.save(schedule), ScheduleResponseDto.class)
                           .setName(user.getName());
@@ -83,6 +80,20 @@ public class JpaCommonEntityService implements CommonEntityService {
         User user = userRepo.findById(userId).get();
         user.removeSchedule(schedule);
         scheduleRepo.deleteById(scheduleId);
+    }
+    @Transactional
+    @Override
+    public CommentResponseDto createComment(CommentSaveRequestDto dto, Long userId, Long scheduleId) {
+        Schedule schedule = scheduleRepo.findById(scheduleId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다." ));
+        User user = userRepo.findById(userId).get();
+        Comment comment = modelMapper.map(dto,Comment.class)
+                                     .setComment_schedule(schedule)
+                                     .setComment_user(user);
+        user.addComment(comment);
+        schedule.addComment(comment);
+        return modelMapper.map(commentRepo.save(comment),CommentResponseDto.class)
+                          .setUserId(user.getUserId())
+                          .setName(user.getName());
     }
 
 }

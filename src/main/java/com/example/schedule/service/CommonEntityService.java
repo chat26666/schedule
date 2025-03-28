@@ -1,9 +1,7 @@
 package com.example.schedule.service;
 import com.example.schedule.UserSaveRequestDto;
-import com.example.schedule.dto.ScheduleResponseDto;
-import com.example.schedule.dto.ScheduleSaveRequestDto;
-import com.example.schedule.dto.UserAuthRequestDto;
-import com.example.schedule.dto.UserResponseDto;
+import com.example.schedule.dto.*;
+
 import java.util.Map;
 
 public interface CommonEntityService {
@@ -15,4 +13,5 @@ public interface CommonEntityService {
     UserResponseDto findUser(Long userId);
     ScheduleResponseDto createSchedule(ScheduleSaveRequestDto dto, Long userId);
     void deleteSchedule(Long userId, Long scheduleId);
+    CommentResponseDto createComment(CommentSaveRequestDto dto, Long userId, Long scheduleId);
 }
