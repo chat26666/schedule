@@ -27,7 +27,6 @@ public class AuthController {
       public ResponseEntity<Map<String, String>> userLogin(@RequestBody @Validated({Default.class, AuthLogin.class}) UserAuthRequestDto dto, HttpServletRequest request) {
 
           if(request.getSession(false) != null) {
-              System.out.println(request.getSession(false).getAttribute("userId"));
               return new ResponseEntity<>(Map.of("message","already logged in"), HttpStatus.OK);}
           else {
               commonService.authUser(dto);
