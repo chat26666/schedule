@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.Map;
 
 @Service
@@ -81,6 +80,9 @@ public class JpaCommonEntityService implements CommonEntityService {
         Long check_userId = schedule.getSchedule_user().getUserId();
         if (!userId.equals(check_userId))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 게시글의 주인이 아닙니다.");
+
+        //해당 인증로직 중복처리 필요
+
         User user = userRepo.findById(userId).get();
         user.removeSchedule(schedule);
         scheduleRepo.deleteById(scheduleId);
@@ -90,6 +92,9 @@ public class JpaCommonEntityService implements CommonEntityService {
     @Override
     public CommentResponseDto createComment(CommentSaveRequestDto dto, Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepo.findById(scheduleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
+
+        //해당 인증로직 중복처리 필요
+
         User user = userRepo.findById(userId).get();
         Comment comment = modelMapper.map(dto, Comment.class).setComment_schedule(schedule).setComment_user(user);
         user.addComment(comment);
@@ -108,6 +113,9 @@ public class JpaCommonEntityService implements CommonEntityService {
         if (!scheduleId.equals(check_scheduleId))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 게시글의 댓글이 아닙니다.");
         User user = userRepo.findById(userId).get();
+
+        //해당 인증로직 중복처리 필요
+
         schedule.removeComment(comment);
         user.removeComment(comment);
         commentRepo.deleteById(commentId);
@@ -119,6 +127,9 @@ public class JpaCommonEntityService implements CommonEntityService {
         Long check_userId = comment.getComment_user().getUserId();
         if (!userId.equals(check_userId)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 댓글의 주인이 아닙니다.");
         scheduleRepo.findById(scheduleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
+
+        //해당 인증로직 중복처리 필요
+
         Long check_scheduleId = comment.getComment_schedule().getScheduleId();
         if (!scheduleId.equals(check_scheduleId))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 게시글의 댓글이 아닙니다.");
@@ -127,6 +138,4 @@ public class JpaCommonEntityService implements CommonEntityService {
 
         return modelMapper.map(comment,CommentResponseDto.class).setName(user.getName()).setUserId(user.getUserId());
     }
-
-
 }
