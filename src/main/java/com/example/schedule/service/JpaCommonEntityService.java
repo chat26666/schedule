@@ -61,6 +61,13 @@ public class JpaCommonEntityService implements CommonEntityService {
     }
     @Transactional
     @Override
+    public UserResponseDto findUser(Long userId) {
+        User user = userRepo.findById(userId)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "계정이 존재하지 않습니다."));
+        return modelMapper.map(user, UserResponseDto.class);
+    }
+    @Transactional
+    @Override
     public ScheduleResponseDto createSchedule(ScheduleSaveRequestDto dto, Long userId) {
         Schedule schedule = modelMapper.map(dto, Schedule.class);
         User user = userRepo.findById(userId).get();
@@ -68,6 +75,14 @@ public class JpaCommonEntityService implements CommonEntityService {
         user.addSchedule(schedule);
         return modelMapper.map(scheduleRepo.save(schedule), ScheduleResponseDto.class)
                           .setName(user.getName());
+    }
+    @Transactional
+    @Override
+    public void deleteSchedule(Long userId, Long scheduleId) {
+        Schedule schedule = scheduleRepo.findById(scheduleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "일정이 존재하지 않습니다."));
+        User user = userRepo.findById(userId).get();
+        user.removeSchedule(schedule);
+        scheduleRepo.deleteById(scheduleId);
     }
 
 }

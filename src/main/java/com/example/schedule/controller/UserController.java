@@ -44,4 +44,8 @@ public class UserController {
         commonService.authUser(RequestConverter.convertToUserAuthRequest(dto, userId));
         return new ResponseEntity<>(commonService.modifyUser(dto, userId),HttpStatus.OK);
     }
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponseDto> findUser(@PathVariable Long userId) {
+        return new ResponseEntity<>(commonService.findUser(userId),HttpStatus.OK);
+    }
 }
