@@ -9,6 +9,10 @@ import com.example.schedule.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -32,8 +36,10 @@ public class JpaScheduleJoinQueryService implements ScheduleJoinQueryService {
         scheduleRepo.findById(scheduleId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
         return commentRepo.findByScheduleComment(scheduleId);
     }
-    public List<ScheduleResponseDto> findMySchedule(Long userId) {
-        List<Schedule> scheduleList = scheduleRepo.scheduleFindByUserId(userId);
+    public List<ScheduleResponseDto> findScheduleAll(Long userId,Integer page,Integer size) {
+        Pageable pageable = PageRequest.of(page,size, Sort.by("updatedAt").descending());
+        Page<Schedule> schedulePage = scheduleRepo.scheduleFindByUserId(userId, pageable);
+        List<Schedule> scheduleList = schedulePage.getContent();
         List<ScheduleResponseDto> dtoList = new ArrayList<>();
         for(Schedule schedule : scheduleList) {
             ScheduleResponseDto scheduleDto = modelMapper.map(schedule,ScheduleResponseDto.class)

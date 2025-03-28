@@ -32,8 +32,8 @@ public class ScheduleController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
     @GetMapping
-    public ResponseEntity<List<ScheduleResponseDto>> findMySchedule(HttpSession session) {
-        return ResponseEntity.status(HttpStatus.OK).body(joinService.findMySchedule(SessionHelper.getUserId(session)));
+    public ResponseEntity<List<ScheduleResponseDto>> findScheduleAll(HttpSession session, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size) {
+        return ResponseEntity.status(HttpStatus.OK).body(joinService.findScheduleAll(SessionHelper.getUserId(session),page,size));
     }
 
 }

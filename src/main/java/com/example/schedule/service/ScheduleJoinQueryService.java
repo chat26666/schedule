@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface ScheduleJoinQueryService {
     List<CommentResponseDto> findScheduleComment(Long scheduleId);
-    List<ScheduleResponseDto> findMySchedule(Long userId);
+    List<ScheduleResponseDto> findScheduleAll(Long userId,Integer page,Integer size);
 }
