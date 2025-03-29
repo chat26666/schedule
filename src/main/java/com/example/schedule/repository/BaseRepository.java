@@ -12,3 +12,5 @@ public interface BaseRepository<T,ID> extends JpaRepository<T,ID> {
                         HttpStatus.NOT_FOUND, "해당 " + entityName + " 이(가) 존재하지 않습니다."));
     }
 }
+
+//공통으로 사용하는 findOrThrow 함수를 BaseRepository 에 정의하여 코드 반복을 줄였습니다

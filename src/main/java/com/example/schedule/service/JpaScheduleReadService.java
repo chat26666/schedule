@@ -21,6 +21,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 
+// 서비스 클래스의 코드가 방대해지고, 여러 테이블 조인 및 뷰 구성을 위한 로직이 복잡해져 이를 별도의 클래스로 분리하여 관리합니다
+
 @Service
 @RequiredArgsConstructor
 public class JpaScheduleReadService implements ScheduleReadService {

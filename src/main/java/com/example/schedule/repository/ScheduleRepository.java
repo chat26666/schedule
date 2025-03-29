@@ -19,7 +19,6 @@ public interface ScheduleRepository extends BaseRepository<Schedule,Long> {
             "ORDER BY s.updatedAt DESC",
              countQuery = "SELECT COUNT(DISTINCT s) FROM Schedule s JOIN s.schedule_user u WHERE u.userId = :userId")
     Page<Schedule> scheduleFindByUserId(@Param("userId") Long userId, Pageable page);
-    //lazy 로딩을 피하고자 fetch 로 한꺼번에 전부 데이터를 로딩했습니다
 
     @Query("SELECT DISTINCT s FROM Schedule s " +
             "JOIN s.schedule_user u " +
@@ -27,6 +26,7 @@ public interface ScheduleRepository extends BaseRepository<Schedule,Long> {
             "WHERE u.userId = :userId " +
             "AND s.scheduleId = :scheduleId")
     Optional<Schedule> scheduleFindByScheduleId(@Param("userId")Long userId, @Param("scheduleId") Long scheduleId);
-
-
 }
+
+//찾아보니 JPA 는 조인시 SELECT 되는 컬럼이 아니면 지연 로딩이라고 연관관계인 엔티티를 get 으로 조회할 시점에 매번 추가로 Query 를 날린다고 하네요
+//때문에 모든 데이터는 DTO 로 반환될 예정이니 FETCH 로 한번에 긁어오는 것이 더 성능상 이점이라고 판단해서 사용하였습니다

@@ -11,6 +11,8 @@ public interface UserRepository extends BaseRepository<User,Long> {
     @Query("SELECT DISTINCT u FROM User u " +
             "JOIN FETCH u.Comments c " +
             "WHERE u.userId = :userId " +
-            "ORDER BY c.updatedAt DESC")
+            "ORDER BY c.createdAt DESC")
     Optional<User> CommentFindByUser(@Param("userId") Long userId);
 }
+
+//유저가 쓴 댓글 이력을 전부 조회하는 기능입니다
