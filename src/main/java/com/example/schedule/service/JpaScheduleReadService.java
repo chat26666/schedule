@@ -30,67 +30,64 @@ public class JpaScheduleReadService implements ScheduleReadService {
     private final UserRepository userRepo;
     private final ModelMapper modelMapper;
 
-    @Transactional
-    @Override
-    public List<CommentResponseDto> findScheduleComment(Long scheduleId) {
-        scheduleRepo.findById(scheduleId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
-        return commentRepo.findByScheduleComment(scheduleId);
-    }
-    @Transactional
-    @Override
-    public List<ScheduleResponseDto> findScheduleAll(Long userId,Integer page,Integer size) {
-        Pageable pageable = PageRequest.of(page,size, Sort.by("updatedAt").descending());
-        Page<Schedule> schedulePage = scheduleRepo.scheduleFindByUserId(userId, pageable);
-        List<Schedule> scheduleList = schedulePage.getContent();
-        List<ScheduleResponseDto> dtoList = new ArrayList<>();
-        for(Schedule schedule : scheduleList) {
-            ScheduleResponseDto scheduleDto = modelMapper.map(schedule,ScheduleResponseDto.class)
-                                                         .setName(schedule.getSchedule_user().getName())
-                                                         .setComment(new ArrayList<>());
-            List<Comment> commentList = schedule.getComments();
-            if(commentList != null) {
-                for (Comment comment : commentList) {
-                    CommentResponseDto commentDto = modelMapper.map(comment, CommentResponseDto.class)
-                                                               .setName(comment.getComment_user().getName())
-                                                               .setUserId(comment.getComment_user().getUserId());
-                    scheduleDto.getComment().add(commentDto);
-                }
-            }
-            dtoList.add(scheduleDto);
-        }
-        return dtoList;
-    }
-    @Transactional
-    @Override
-    public ScheduleResponseDto findScheduleOne(Long userId, Long scheduleId) {
-        Schedule schedule = scheduleRepo.scheduleFindByScheduleId(userId, scheduleId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"해당 일정이 존재하지 않습니다. 사용자 ID 및 일정 ID를 정확하게 입력해주십시오."));
-        ScheduleResponseDto scheduleDto = modelMapper.map(schedule,ScheduleResponseDto.class)
-                                                     .setName(schedule.getSchedule_user().getName())
-                                                     .setComment(new ArrayList<>());
+    private ScheduleResponseDto convertToScheduleResponseDto(Schedule schedule) {
+        ScheduleResponseDto scheduleDto = modelMapper.map(schedule, ScheduleResponseDto.class)
+                .setName(schedule.getSchedule_user().getName());
+
         List<Comment> commentList = schedule.getComments();
-        if(commentList != null) {
-            for (Comment comment : commentList) {
-                CommentResponseDto commentDto = modelMapper.map(comment, CommentResponseDto.class)
-                        .setName(comment.getComment_user().getName())
-                        .setUserId(comment.getComment_user().getUserId());
-                scheduleDto.getComment().add(commentDto);
-            }
+        for (Comment comment : commentList) {
+            CommentResponseDto commentDto = modelMapper.map(comment, CommentResponseDto.class)
+                    .setName(comment.getComment_user().getName())
+                    .setUserId(comment.getComment_user().getUserId());
+            scheduleDto.getComment().add(commentDto);
         }
         return scheduleDto;
     }
+
+    @Transactional
+    @Override
+    public List<CommentResponseDto> findScheduleComment(Long scheduleId) {
+        scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
+        return commentRepo.findByScheduleComment(scheduleId);
+    }
+
+    @Transactional
+    @Override
+    public List<ScheduleResponseDto> findScheduleAll(Long userId, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").descending());
+        Page<Schedule> schedulePage = scheduleRepo.scheduleFindByUserId(userId, pageable);
+        List<Schedule> scheduleList = schedulePage.getContent();
+
+        List<ScheduleResponseDto> dtoList = new ArrayList<>();
+        for (Schedule schedule : scheduleList) {
+            dtoList.add(convertToScheduleResponseDto(schedule));
+        }
+        return dtoList;
+    }
+
+    @Transactional
+    @Override
+    public ScheduleResponseDto findScheduleOne(Long userId, Long scheduleId) {
+        Schedule schedule = scheduleRepo.scheduleFindByScheduleId(userId, scheduleId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "해당 일정이 존재하지 않습니다. 사용자 ID 및 일정 ID를 정확하게 입력해주십시오."));
+        return convertToScheduleResponseDto(schedule);
+    }
+
     @Transactional
     @Override
     public UserCommentInfoResponseDto findUserComment(Long userId) {
-        User user = userRepo.CommentFindByUser(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"해당 유저가 존재하지 않습니다. 사용자 ID 정확하게 입력해주십시오."));
-        UserCommentInfoResponseDto dto = modelMapper.map(user,UserCommentInfoResponseDto.class);
-        dto.setComment(new ArrayList<>());  // 나중에 필드에서 new 수정
+        User user = userRepo.CommentFindByUser(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "해당 유저가 존재하지 않습니다. 사용자 ID 정확하게 입력해주십시오."));
+        UserCommentInfoResponseDto dto = modelMapper.map(user, UserCommentInfoResponseDto.class);
 
-        for(Comment comment : user.getComments()) {
-            CommentResponseDto commentDto = modelMapper.map(comment,CommentResponseDto.class);
+        for (Comment comment : user.getComments()) {
+            CommentResponseDto commentDto = modelMapper.map(comment, CommentResponseDto.class);
             dto.getComment().add(commentDto);
         }
         return dto;
     }
-
-
 }

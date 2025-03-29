@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class Schedule extends BaseEntitiy {
+public class Schedule extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +27,7 @@ public class Schedule extends BaseEntitiy {
     private String plan;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "comment_schedule")
-    private List<Comment> Comments;
+    private List<Comment> Comments = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "userId")

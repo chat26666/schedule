@@ -3,6 +3,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -10,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class User extends BaseEntitiy {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,10 +28,10 @@ public class User extends BaseEntitiy {
     private String password;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "comment_user")
-    private List<Comment> Comments;
+    private List<Comment> Comments = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "schedule_user")
-    private List<Schedule> Schedules;
+    private List<Schedule> Schedules = new ArrayList<>();
 
     public void addSchedule(Schedule schedule) {
         Schedules.add(schedule);

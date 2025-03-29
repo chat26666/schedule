@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -18,5 +19,5 @@ public class ScheduleResponseDto {
     private String plan;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<CommentResponseDto> comment;
+    private List<CommentResponseDto> comment = new ArrayList<>();
 }

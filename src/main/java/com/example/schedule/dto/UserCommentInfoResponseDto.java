@@ -2,6 +2,8 @@ package com.example.schedule.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -12,5 +14,5 @@ public class UserCommentInfoResponseDto {
     private String email;
     private String createdAt;
     private String updatedAt;
-    private List<CommentResponseDto> comment;
+    private List<CommentResponseDto> comment = new ArrayList<>();
 }
