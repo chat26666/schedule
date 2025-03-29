@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class User extends Base {
+public class User extends BaseEntitiy {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

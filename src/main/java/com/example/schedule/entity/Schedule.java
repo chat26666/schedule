@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class Schedule extends Base {
+public class Schedule extends BaseEntitiy {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

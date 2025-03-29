@@ -26,20 +26,24 @@ public class JpaCommonEntityService implements CommonEntityService {
     private final ModelMapper modelMapper;
     private final ScheduleReadService joinService;
 
+    private void checkId(Long session_id,Long id,String message){
+        if (!session_id.equals(id)) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, message);
+    }
+
+    @Transactional
+    @Override
+    public void authUser(UserAuthRequestDto dto) {
+        User user = userRepo.findOrThrow(dto.getUserId(),User.class.getSimpleName());
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword()))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 틀렸습니다.");
+    }
+
     @Transactional
     @Override
     public Map<String, Long> createUser(UserSaveRequestDto dto) {
         User user = modelMapper.map(dto, User.class).setPassword(passwordEncoder.encode(dto.getPassword()));
         Long userId = userRepo.save(user).getUserId();
         return Map.of("userId", userId);
-    }
-
-    @Transactional
-    @Override
-    public void authUser(UserAuthRequestDto dto) {
-        User user = userRepo.findById(dto.getUserId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "계정이 틀렸습니다"));
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword()))
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 틀렸습니다.");
     }
 
     @Transactional
@@ -54,14 +58,14 @@ public class JpaCommonEntityService implements CommonEntityService {
     public UserInfoResponseDto modifyUser(UserSaveRequestDto dto, Long userId) {
         User user = userRepo.findById(userId).get().setName(dto.getName()).setEmail(dto.getEmail());
         userRepo.flush();
-        //플러시를 안해주면 dto 에 수정시간이 반영되지 않음
         return modelMapper.map(user, UserInfoResponseDto.class);
+        //플러시를 안해주면 Dto 에 수정시간이 반영되지 않음
     }
 
     @Transactional
     @Override
     public UserInfoResponseDto findUser(Long userId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "계정이 존재하지 않습니다."));
+        User user = userRepo.findOrThrow(userId,User.class.getSimpleName());
         return modelMapper.map(user, UserInfoResponseDto.class);
     }
 
@@ -77,11 +81,9 @@ public class JpaCommonEntityService implements CommonEntityService {
     @Transactional
     @Override
     public ScheduleResponseDto modifySchedule(ScheduleSaveRequestDto dto, Long userId, Long scheduleId) {
-        Schedule schedule = scheduleRepo.findById(scheduleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "일정이 존재하지 않습니다."));
+        Schedule schedule = scheduleRepo.findOrThrow(scheduleId,Schedule.class.getSimpleName());
         Long check_userId = schedule.getSchedule_user().getUserId();
-        if (!userId.equals(check_userId))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 게시글의 주인이 아닙니다.");
-        //해당 인증로직 중복처리 필요
+        checkId(userId,check_userId,"해당 게시글의 주인이 아닙니다");
         schedule.setTitle(dto.getTitle()).setPlan(dto.getPlan());
         scheduleRepo.flush();
         return joinService.findScheduleOne(userId,scheduleId);
@@ -90,13 +92,9 @@ public class JpaCommonEntityService implements CommonEntityService {
     @Transactional
     @Override
     public void deleteSchedule(Long userId, Long scheduleId) {
-        Schedule schedule = scheduleRepo.findById(scheduleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "일정이 존재하지 않습니다."));
+        Schedule schedule = scheduleRepo.findOrThrow(scheduleId,Schedule.class.getSimpleName());
         Long check_userId = schedule.getSchedule_user().getUserId();
-        if (!userId.equals(check_userId))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 게시글의 주인이 아닙니다.");
-
-        //해당 인증로직 중복처리 필요
-
+        checkId(userId,check_userId,"해당 게시글의 주인이 아닙니다");
         User user = userRepo.findById(userId).get();
         user.removeSchedule(schedule);
         scheduleRepo.deleteById(scheduleId);
@@ -105,10 +103,7 @@ public class JpaCommonEntityService implements CommonEntityService {
     @Transactional
     @Override
     public CommentResponseDto createComment(CommentSaveRequestDto dto, Long userId, Long scheduleId) {
-        Schedule schedule = scheduleRepo.findById(scheduleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
-
-        //해당 인증로직 중복처리 필요
-
+        Schedule schedule = scheduleRepo.findOrThrow(scheduleId,Schedule.class.getSimpleName());
         User user = userRepo.findById(userId).get();
         Comment comment = modelMapper.map(dto, Comment.class).setComment_schedule(schedule).setComment_user(user);
         user.addComment(comment);
@@ -119,17 +114,13 @@ public class JpaCommonEntityService implements CommonEntityService {
     @Transactional
     @Override
     public void deleteComment(Long userId, Long scheduleId, Long commentId) {
-        Comment comment = commentRepo.findById(commentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 댓글이 존재하지 않습니다."));
+        Comment comment = commentRepo.findOrThrow(commentId,Comment.class.getSimpleName());
         Long check_userId = comment.getComment_user().getUserId();
-        if (!userId.equals(check_userId)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 댓글의 주인이 아닙니다.");
-        Schedule schedule = scheduleRepo.findById(scheduleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
+        checkId(userId,check_userId,"해당 댓글의 주인이 아닙니다");
+        Schedule schedule = scheduleRepo.findOrThrow(scheduleId,Schedule.class.getSimpleName());
         Long check_scheduleId = comment.getComment_schedule().getScheduleId();
-        if (!scheduleId.equals(check_scheduleId))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 게시글의 댓글이 아닙니다.");
+        checkId(scheduleId,check_scheduleId,"해당 게시글의 댓글이 아닙니다");
         User user = userRepo.findById(userId).get();
-
-        //해당 인증로직 중복처리 필요
-
         schedule.removeComment(comment);
         user.removeComment(comment);
         commentRepo.deleteById(commentId);
@@ -137,19 +128,14 @@ public class JpaCommonEntityService implements CommonEntityService {
     @Transactional
     @Override
     public CommentResponseDto modifyComment(CommentSaveRequestDto dto,Long userId, Long scheduleId, Long commentId) {
-        Comment comment = commentRepo.findById(commentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 댓글이 존재하지 않습니다."));
+        Comment comment = commentRepo.findOrThrow(commentId,Comment.class.getSimpleName());
         Long check_userId = comment.getComment_user().getUserId();
-        if (!userId.equals(check_userId)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 댓글의 주인이 아닙니다.");
-        scheduleRepo.findById(scheduleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
-
-        //해당 인증로직 중복처리 필요
-
+        checkId(userId,check_userId,"해당 댓글의 주인이 아닙니다");
+        scheduleRepo.findOrThrow(scheduleId,Schedule.class.getSimpleName());
         Long check_scheduleId = comment.getComment_schedule().getScheduleId();
-        if (!scheduleId.equals(check_scheduleId))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 게시글의 댓글이 아닙니다.");
+        checkId(scheduleId,check_scheduleId,"해당 게시글의 댓글이 아닙니다");
         comment.setMention(dto.getMention());
         User user = userRepo.findById(userId).get();
-
         return modelMapper.map(comment,CommentResponseDto.class).setName(user.getName()).setUserId(user.getUserId());
     }
 }

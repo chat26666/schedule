@@ -5,11 +5,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.PatternMatchUtils;
-
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -40,11 +38,8 @@ public class LoginFilter implements Filter {
             String errorJson = objectMapper.writeValueAsString(errorBody);
             response.getWriter().write(errorJson);
         }
-
-
     }
     public boolean isBlackList(String requestURI){
-
         return PatternMatchUtils.simpleMatch(BlackListPath, requestURI);
     }
 

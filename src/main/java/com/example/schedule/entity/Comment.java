@@ -11,7 +11,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class Comment extends Base {
+public class Comment extends BaseEntitiy {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
