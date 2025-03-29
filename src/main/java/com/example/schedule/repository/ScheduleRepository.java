@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
@@ -18,4 +19,14 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
              countQuery = "SELECT COUNT(DISTINCT s) FROM Schedule s JOIN s.schedule_user u WHERE u.userId = :userId")
     Page<Schedule> scheduleFindByUserId(@Param("userId") Long userId, Pageable page);
     //lazy 로딩을 피하고자 fetch 로 한꺼번에 전부 데이터를 로딩했습니다
+
+
+    @Query("SELECT s FROM Schedule s " +
+            "JOIN s.schedule_user u " +
+            "LEFT JOIN s.Comments c " +
+            "WHERE u.userId = :userId " +
+            "AND s.scheduleId = :scheduleId")
+    Optional<Schedule> scheduleFindByScheduleId(@Param("userId")Long userId, @Param("scheduleId") Long scheduleId);
+
+
 }

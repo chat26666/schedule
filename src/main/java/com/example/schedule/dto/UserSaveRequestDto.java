@@ -2,13 +2,9 @@ package com.example.schedule;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
-@AllArgsConstructor
 public class UserSaveRequestDto {
 
     @NotBlank(message = "이름은 필수 입력값입니다.")

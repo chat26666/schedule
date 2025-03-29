@@ -24,6 +24,7 @@ public class JpaCommonEntityService implements CommonEntityService {
     private final ScheduleRepository scheduleRepo;
     private final UserRepository userRepo;
     private final ModelMapper modelMapper;
+    private final ScheduleJoinQueryService joinService;
 
     @Transactional
     @Override
@@ -71,6 +72,19 @@ public class JpaCommonEntityService implements CommonEntityService {
         User user = userRepo.findById(userId).get();
         user.addSchedule(schedule);
         return modelMapper.map(scheduleRepo.save(schedule), ScheduleResponseDto.class).setName(user.getName());
+    }
+
+    @Transactional
+    @Override
+    public ScheduleResponseDto modifySchedule(ScheduleSaveRequestDto dto, Long userId, Long scheduleId) {
+        Schedule schedule = scheduleRepo.findById(scheduleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "일정이 존재하지 않습니다."));
+        Long check_userId = schedule.getSchedule_user().getUserId();
+        if (!userId.equals(check_userId))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 게시글의 주인이 아닙니다.");
+        //해당 인증로직 중복처리 필요
+        schedule.setTitle(dto.getTitle()).setPlan(dto.getPlan());
+        scheduleRepo.flush();
+        return joinService.findScheduleOne(userId,scheduleId);
     }
 
     @Transactional

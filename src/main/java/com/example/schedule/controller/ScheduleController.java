@@ -35,5 +35,12 @@ public class ScheduleController {
     public ResponseEntity<List<ScheduleResponseDto>> findScheduleAll(HttpSession session, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size) {
         return ResponseEntity.status(HttpStatus.OK).body(joinService.findScheduleAll(SessionHelper.getUserId(session),page,size));
     }
-
+    @GetMapping("/{scheduleId}")
+    public ResponseEntity<ScheduleResponseDto> findScheduleOne(@PathVariable Long scheduleId , HttpSession session) {
+        return ResponseEntity.status(HttpStatus.OK).body(joinService.findScheduleOne(SessionHelper.getUserId(session),scheduleId));
+    }
+    @PutMapping("/{scheduleId}")
+    public ResponseEntity<ScheduleResponseDto> modifySchedule(@RequestBody @Validated ScheduleSaveRequestDto dto, @PathVariable Long scheduleId, HttpSession session) {
+        return ResponseEntity.status(HttpStatus.OK).body(commonService.modifySchedule(dto,SessionHelper.getUserId(session),scheduleId));
+    }
 }

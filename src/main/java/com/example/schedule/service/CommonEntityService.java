@@ -16,4 +16,5 @@ public interface CommonEntityService {
     CommentResponseDto createComment(CommentSaveRequestDto dto, Long userId, Long scheduleId);
     void deleteComment(Long userId, Long scheduleId, Long commentId);
     CommentResponseDto modifyComment(CommentSaveRequestDto dto, Long userId, Long scheduleId, Long commentId);
+    ScheduleResponseDto modifySchedule(ScheduleSaveRequestDto dto, Long userId, Long scheduleId);
 }

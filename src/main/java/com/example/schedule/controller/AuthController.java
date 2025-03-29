@@ -35,6 +35,14 @@ public class AuthController {
               return new ResponseEntity<>(Map.of("message","login success"),HttpStatus.OK);
           }
       }
-
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> userLogout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if(session != null) {
+            session.invalidate();
+            return new ResponseEntity<>(Map.of("message","logout success"), HttpStatus.OK);
+        }
+        else return new ResponseEntity<>(Map.of("message","you are not logged in"), HttpStatus.BAD_REQUEST);
+    }
 
 }

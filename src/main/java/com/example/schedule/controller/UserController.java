@@ -37,6 +37,7 @@ public class UserController {
         //삭제후 세션파기 필요
         dto.setUserId(userId);
         commonService.deleteUser(dto, userId);
+        session.invalidate();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @PutMapping("/{userId}")
@@ -55,5 +56,9 @@ public class UserController {
     @GetMapping("/{userId}/schedules")
     public ResponseEntity<List<ScheduleResponseDto>> findScheduleAll(@PathVariable Long userId, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size) {
         return ResponseEntity.status(HttpStatus.OK).body(joinService.findScheduleAll(userId,page,size));
+    }
+    @GetMapping("/{userId}/schedules/{scheduleId}")
+    public ResponseEntity<ScheduleResponseDto> findScheduleOne(@PathVariable Long userId, @PathVariable Long scheduleId) {
+        return ResponseEntity.status(HttpStatus.OK).body(joinService.findScheduleOne(userId,scheduleId));
     }
 }
