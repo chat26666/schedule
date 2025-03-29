@@ -1,10 +1,13 @@
 package com.example.schedule.service;
 import com.example.schedule.dto.CommentResponseDto;
 import com.example.schedule.dto.ScheduleResponseDto;
+import com.example.schedule.dto.UserCommentInfoResponseDto;
+
 import java.util.List;
 
-public interface ScheduleJoinQueryService {
+public interface ScheduleReadService {
     List<CommentResponseDto> findScheduleComment(Long scheduleId);
     List<ScheduleResponseDto> findScheduleAll(Long userId,Integer page,Integer size);
     ScheduleResponseDto findScheduleOne(Long userId, Long scheduleId);
+    UserCommentInfoResponseDto findUserComment(Long userId);
 }

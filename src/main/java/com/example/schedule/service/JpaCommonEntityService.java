@@ -24,7 +24,7 @@ public class JpaCommonEntityService implements CommonEntityService {
     private final ScheduleRepository scheduleRepo;
     private final UserRepository userRepo;
     private final ModelMapper modelMapper;
-    private final ScheduleJoinQueryService joinService;
+    private final ScheduleReadService joinService;
 
     @Transactional
     @Override
@@ -51,18 +51,18 @@ public class JpaCommonEntityService implements CommonEntityService {
 
     @Transactional
     @Override
-    public UserResponseDto modifyUser(UserSaveRequestDto dto, Long userId) {
+    public UserInfoResponseDto modifyUser(UserSaveRequestDto dto, Long userId) {
         User user = userRepo.findById(userId).get().setName(dto.getName()).setEmail(dto.getEmail());
         userRepo.flush();
         //플러시를 안해주면 dto 에 수정시간이 반영되지 않음
-        return modelMapper.map(user, UserResponseDto.class);
+        return modelMapper.map(user, UserInfoResponseDto.class);
     }
 
     @Transactional
     @Override
-    public UserResponseDto findUser(Long userId) {
+    public UserInfoResponseDto findUser(Long userId) {
         User user = userRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "계정이 존재하지 않습니다."));
-        return modelMapper.map(user, UserResponseDto.class);
+        return modelMapper.map(user, UserInfoResponseDto.class);
     }
 
     @Transactional

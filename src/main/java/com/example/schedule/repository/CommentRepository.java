@@ -15,7 +15,8 @@ public interface CommentRepository extends JpaRepository<Comment,Long>  {
             "FROM Comment c " +
             "JOIN c.comment_user u " +
             "JOIN c.comment_schedule s " +
-            "WHERE s.scheduleId = :scheduleId")
+            "WHERE s.scheduleId = :scheduleId " +
+            "ORDER BY c.createdAt ASC")
     List<CommentResponseDto> findByScheduleComment(@Param("scheduleId") Long scheduleId);
 
 }

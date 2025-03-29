@@ -20,10 +20,9 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
     Page<Schedule> scheduleFindByUserId(@Param("userId") Long userId, Pageable page);
     //lazy 로딩을 피하고자 fetch 로 한꺼번에 전부 데이터를 로딩했습니다
 
-
-    @Query("SELECT s FROM Schedule s " +
+    @Query("SELECT DISTINCT s FROM Schedule s " +
             "JOIN s.schedule_user u " +
-            "LEFT JOIN s.Comments c " +
+            "LEFT JOIN FETCH s.Comments c " +
             "WHERE u.userId = :userId " +
             "AND s.scheduleId = :scheduleId")
     Optional<Schedule> scheduleFindByScheduleId(@Param("userId")Long userId, @Param("scheduleId") Long scheduleId);

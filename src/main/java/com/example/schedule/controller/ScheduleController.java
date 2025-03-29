@@ -2,7 +2,7 @@ package com.example.schedule.controller;
 import com.example.schedule.dto.ScheduleResponseDto;
 import com.example.schedule.dto.ScheduleSaveRequestDto;
 import com.example.schedule.service.CommonEntityService;
-import com.example.schedule.service.ScheduleJoinQueryService;
+import com.example.schedule.service.ScheduleReadService;
 import com.example.schedule.util.SessionHelper;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.List;
 public class ScheduleController {
 
     private final CommonEntityService commonService;
-    private final ScheduleJoinQueryService joinService;
+    private final ScheduleReadService joinService;
 
     @PostMapping
     public ResponseEntity<ScheduleResponseDto> createSchedule(@RequestBody @Validated ScheduleSaveRequestDto dto, HttpSession session) {

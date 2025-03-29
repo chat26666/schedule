@@ -1,8 +1,10 @@
 package com.example.schedule.service;
 import com.example.schedule.dto.CommentResponseDto;
 import com.example.schedule.dto.ScheduleResponseDto;
+import com.example.schedule.dto.UserCommentInfoResponseDto;
 import com.example.schedule.entity.Comment;
 import com.example.schedule.entity.Schedule;
+import com.example.schedule.entity.User;
 import com.example.schedule.repository.CommentRepository;
 import com.example.schedule.repository.ScheduleRepository;
 import com.example.schedule.repository.UserRepository;
@@ -21,7 +23,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class JpaScheduleJoinQueryService implements ScheduleJoinQueryService {
+public class JpaScheduleReadService implements ScheduleReadService {
 
     private final CommentRepository commentRepo;
     private final ScheduleRepository scheduleRepo;
@@ -75,6 +77,19 @@ public class JpaScheduleJoinQueryService implements ScheduleJoinQueryService {
             }
         }
         return scheduleDto;
+    }
+    @Transactional
+    @Override
+    public UserCommentInfoResponseDto findUserComment(Long userId) {
+        User user = userRepo.CommentFindByUser(userId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"해당 유저가 존재하지 않습니다. 사용자 ID 정확하게 입력해주십시오."));
+        UserCommentInfoResponseDto dto = modelMapper.map(user,UserCommentInfoResponseDto.class);
+        dto.setComment(new ArrayList<>());  // 나중에 필드에서 new 수정
+
+        for(Comment comment : user.getComments()) {
+            CommentResponseDto commentDto = modelMapper.map(comment,CommentResponseDto.class);
+            dto.getComment().add(commentDto);
+        }
+        return dto;
     }
 
 

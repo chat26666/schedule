@@ -2,10 +2,11 @@ package com.example.schedule.controller;
 import com.example.schedule.UserSaveRequestDto;
 import com.example.schedule.dto.ScheduleResponseDto;
 import com.example.schedule.dto.UserAuthRequestDto;
-import com.example.schedule.dto.UserResponseDto;
+import com.example.schedule.dto.UserCommentInfoResponseDto;
+import com.example.schedule.dto.UserInfoResponseDto;
 import com.example.schedule.dto.converter.RequestConverter;
 import com.example.schedule.service.CommonEntityService;
-import com.example.schedule.service.ScheduleJoinQueryService;
+import com.example.schedule.service.ScheduleReadService;
 import com.example.schedule.util.SessionHelper;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ import java.util.Map;
 public class UserController {
 
     private final CommonEntityService commonService;
-    private final ScheduleJoinQueryService joinService;
+    private final ScheduleReadService joinService;
 
     @PostMapping
     public ResponseEntity<Map<String,Object>> createUser(@RequestBody @Validated UserSaveRequestDto dto) {
@@ -34,23 +35,21 @@ public class UserController {
         if (!SessionHelper.isUserAuthorized(session, userId))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         //나중에 예외 처리 수정 필요
-        //삭제후 세션파기 필요
         dto.setUserId(userId);
         commonService.deleteUser(dto, userId);
         session.invalidate();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @PutMapping("/{userId}")
-    public ResponseEntity<UserResponseDto> modifyUser(@RequestBody @Validated UserSaveRequestDto dto, @PathVariable Long userId , HttpSession session) {
+    public ResponseEntity<UserInfoResponseDto> modifyUser(@RequestBody @Validated UserSaveRequestDto dto, @PathVariable Long userId , HttpSession session) {
         if (!SessionHelper.isUserAuthorized(session, userId))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         //나중에 예외 처리 수정 필요
-        //삭제후 세션파기 필요
         commonService.authUser(RequestConverter.convertToUserAuthRequest(dto, userId));
         return new ResponseEntity<>(commonService.modifyUser(dto, userId),HttpStatus.OK);
     }
     @GetMapping("/{userId}")
-    public ResponseEntity<UserResponseDto> findUser(@PathVariable Long userId) {
+    public ResponseEntity<UserInfoResponseDto> findUser(@PathVariable Long userId) {
         return new ResponseEntity<>(commonService.findUser(userId),HttpStatus.OK);
     }
     @GetMapping("/{userId}/schedules")
@@ -60,5 +59,9 @@ public class UserController {
     @GetMapping("/{userId}/schedules/{scheduleId}")
     public ResponseEntity<ScheduleResponseDto> findScheduleOne(@PathVariable Long userId, @PathVariable Long scheduleId) {
         return ResponseEntity.status(HttpStatus.OK).body(joinService.findScheduleOne(userId,scheduleId));
+    }
+    @GetMapping("/{userId}/comments")
+    public ResponseEntity<UserCommentInfoResponseDto> findUserComment(@PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(joinService.findUserComment(userId));
     }
 }
