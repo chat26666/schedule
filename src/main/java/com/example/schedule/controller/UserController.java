@@ -31,7 +31,7 @@ public class UserController {
         return new ResponseEntity(commonService.createUser(dto), HttpStatus.CREATED);
     }
     @DeleteMapping("/{userId}")
-    public ResponseEntity<String> deleteUser(@RequestBody @Validated UserAuthRequestDto dto, @PathVariable Long userId , HttpSession session) {
+    public ResponseEntity<Void> deleteUser(@RequestBody @Validated UserAuthRequestDto dto, @PathVariable Long userId , HttpSession session) {
         if (!SessionHelper.isUserAuthorized(session, userId))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         //나중에 예외 처리 수정 필요

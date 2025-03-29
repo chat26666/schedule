@@ -23,26 +23,33 @@ public class AuthController {
 
     private final CommonEntityService commonService;
 
-      @PostMapping("/login")
-      public ResponseEntity<Map<String, String>> userLogin(@RequestBody @Validated({Default.class, AuthLogin.class}) UserAuthRequestDto dto, HttpServletRequest request) {
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, String>> userLogin(
+            @RequestBody @Validated({Default.class, AuthLogin.class}) UserAuthRequestDto dto,
+            HttpServletRequest request) {
 
-          if(request.getSession(false) != null) {
-              return new ResponseEntity<>(Map.of("message","already logged in"), HttpStatus.OK);}
-          else {
-              commonService.authUser(dto);
-              HttpSession session = request.getSession(true);
-              session.setAttribute("userId",dto.getUserId());
-              return new ResponseEntity<>(Map.of("message","login success"),HttpStatus.OK);
-          }
-      }
+        if (request.getSession(false) != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "already logged in"));
+        } else {
+            commonService.authUser(dto);
+            HttpSession session = request.getSession(true);
+            session.setAttribute("userId", dto.getUserId());
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(Map.of("message", "login success"));
+        }
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> userLogout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        if(session != null) {
+        if (session != null) {
             session.invalidate();
-            return new ResponseEntity<>(Map.of("message","logout success"), HttpStatus.OK);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(Map.of("message", "logout success"));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "you are not logged in"));
         }
-        else return new ResponseEntity<>(Map.of("message","you are not logged in"), HttpStatus.BAD_REQUEST);
     }
-
 }

@@ -71,7 +71,7 @@ public class JpaScheduleReadService implements ScheduleReadService {
         Schedule schedule = scheduleRepo.scheduleFindByScheduleId(userId, scheduleId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "해당 일정이 존재하지 않습니다. 사용자 ID 및 일정 ID를 정확하게 입력해주십시오."));
+                        "해당 일정이 존재하지 않습니다. 사용자 ID 및 일정 ID 정확하게 입력해주십시오."));
         return convertToScheduleResponseDto(schedule);
     }
 
