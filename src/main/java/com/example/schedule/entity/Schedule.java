@@ -38,6 +38,7 @@ public class Schedule extends BaseEntity {
         Comments.add(comment);
         comment.setComment_schedule(this);
     }
+
     public void removeComment(Comment comment) {
         Comments.remove(comment);
         comment.setComment_schedule(null);

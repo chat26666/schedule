@@ -40,8 +40,8 @@ public class UserController {
             @RequestBody @Validated UserAuthRequestDto dto,
             @PathVariable @Min(value = 1, message = "유저 ID 최소값은 1 이상이어야 합니다") Long userId,
             HttpSession session) {
-        if (!SessionHelper.isUserAuthorized(session, userId))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
+        if (!SessionHelper.isUserAuthorized(session, userId) && commonService.findUser(userId) != null)
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId : 해당 계정의 변경 권한이 없습니다");
         dto.setUserId(userId);
         commonService.deleteUser(dto, userId);
         session.invalidate();
@@ -53,8 +53,8 @@ public class UserController {
             @RequestBody @Validated UserSaveRequestDto dto,
             @PathVariable @Min(value = 1, message = "유저 ID 최소값은 1 이상이어야 합니다") Long userId,
             HttpSession session) {
-        if (!SessionHelper.isUserAuthorized(session, userId))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
+        if (!SessionHelper.isUserAuthorized(session, userId) && commonService.findUser(userId) != null)
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId : 해당 계정의 변경 권한이 없습니다");
         commonService.authUser(RequestConverter.convertToUserAuthRequest(dto, userId));
         return new ResponseEntity<>(commonService.modifyUser(dto, userId), HttpStatus.OK);
     }
@@ -68,8 +68,8 @@ public class UserController {
     @GetMapping("/{userId}/schedules")
     public ResponseEntity<List<ScheduleResponseDto>> findScheduleAll(
             @PathVariable @Min(value = 1, message = "유저 ID 최소값은 1 이상이어야 합니다") Long userId,
-            @RequestParam(defaultValue = "1") @Min(value = 1, message = "page 최소값은 1 이상이어야 합니다") Integer page,
-            @RequestParam(defaultValue = "10") @Min(value = 1, message = "size 최소값은 1 이상이어야 합니다") Integer size) {
+            @RequestParam(defaultValue = "1") @Min(value = 1, message = "최소값은 1 이상이어야 합니다") Integer page,
+            @RequestParam(defaultValue = "10") @Min(value = 1, message = "최소값은 1 이상이어야 합니다") Integer size) {
         return ResponseEntity.status(HttpStatus.OK).body(joinService.findScheduleAll(userId, page - 1, size));
     }
 

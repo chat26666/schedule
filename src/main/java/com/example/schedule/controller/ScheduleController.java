@@ -41,10 +41,10 @@ public class ScheduleController {
     @GetMapping
     public ResponseEntity<List<ScheduleResponseDto>> findScheduleAll(
             HttpSession session,
-            @RequestParam(defaultValue = "0") @Min(value = 1, message = "page 최소값은 1 이상이어야 합니다") Integer page,
-            @RequestParam(defaultValue = "10") @Min(value = 1, message = "size 최소값은 1 이상이어야 합니다") Integer size) {
+            @RequestParam(defaultValue = "1") @Min(value = 1, message = "최소값은 1 이상이어야 합니다") Integer page,
+            @RequestParam(defaultValue = "10") @Min(value = 1, message = "최소값은 1 이상이어야 합니다") Integer size) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(joinService.findScheduleAll(SessionHelper.getUserId(session), page, size));
+                .body(joinService.findScheduleAll(SessionHelper.getUserId(session), page - 1, size));
     }
 
     @GetMapping("/{scheduleId}")

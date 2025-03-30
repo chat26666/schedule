@@ -73,7 +73,7 @@ public class JpaScheduleReadService implements ScheduleReadService {
         Schedule schedule = scheduleRepo.scheduleFindByScheduleId(userId, scheduleId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "해당 일정이 존재하지 않습니다. 사용자 ID 및 일정 ID 정확하게 입력해주십시오."));
+                        "scheduleId : 해당 schedule 이(가) 존재하지 않습니다 올바른 user 인지 혹은 scheduleId 를 확인해주십시오"));
         return convertToScheduleResponseDto(schedule);
     }
 
@@ -83,7 +83,7 @@ public class JpaScheduleReadService implements ScheduleReadService {
         User user = userRepo.CommentFindByUser(userId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "해당 유저가 존재하지 않습니다. 사용자 ID 정확하게 입력해주십시오."));
+                        "userId : 해당 user 이(가) 존재하지 않습니다"));
         UserCommentInfoResponseDto dto = modelMapper.map(user, UserCommentInfoResponseDto.class);
 
         for (Comment comment : user.getComments()) {

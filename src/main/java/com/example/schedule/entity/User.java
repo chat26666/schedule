@@ -3,7 +3,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,14 +36,17 @@ public class User extends BaseEntity {
         Schedules.add(schedule);
         schedule.setSchedule_user(this);
     }
+
     public void removeSchedule(Schedule schedule) {
         Schedules.remove(schedule);
         schedule.setSchedule_user(null);
     }
+
     public void addComment(Comment comment) {
         Comments.add(comment);
         comment.setComment_user(this);
     }
+
     public void removeComment(Comment comment) {
         Comments.remove(comment);
         comment.setComment_user(null);

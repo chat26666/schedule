@@ -31,7 +31,7 @@ public class JpaCommonEntityService implements CommonEntityService {
 
     private void checkId(Long session_id, Long id, String message) {
         if (!session_id.equals(id))
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, message);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, message);
     }
 
     @Transactional
@@ -39,7 +39,7 @@ public class JpaCommonEntityService implements CommonEntityService {
     public void authUser(UserAuthRequestDto dto) {
         User user = userRepo.findOrThrow(dto.getUserId(), User.class.getSimpleName());
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword()))
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 틀렸습니다.");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "password : 비밀번호가 틀렸습니다");
     }
 
     @Transactional
@@ -91,7 +91,7 @@ public class JpaCommonEntityService implements CommonEntityService {
     public ScheduleResponseDto modifySchedule(ScheduleSaveRequestDto dto, Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
         Long check_userId = schedule.getSchedule_user().getUserId();
-        checkId(userId, check_userId, "해당 게시글의 주인이 아닙니다");
+        checkId(userId, check_userId, "userId : 해당 일정의 작성자가 아닙니다");
         schedule.setTitle(dto.getTitle()).setPlan(dto.getPlan());
         scheduleRepo.flush();
         return joinService.findScheduleOne(userId, scheduleId);
@@ -102,7 +102,7 @@ public class JpaCommonEntityService implements CommonEntityService {
     public void deleteSchedule(Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
         Long check_userId = schedule.getSchedule_user().getUserId();
-        checkId(userId, check_userId, "해당 게시글의 주인이 아닙니다");
+        checkId(userId, check_userId, "userId : 해당 일정의 작성자가 아닙니다");
         User user = userRepo.findById(userId).get();
         user.removeSchedule(schedule);
         scheduleRepo.deleteById(scheduleId);
@@ -128,10 +128,10 @@ public class JpaCommonEntityService implements CommonEntityService {
     public void deleteComment(Long userId, Long scheduleId, Long commentId) {
         Comment comment = commentRepo.findOrThrow(commentId, Comment.class.getSimpleName());
         Long check_userId = comment.getComment_user().getUserId();
-        checkId(userId, check_userId, "해당 댓글의 주인이 아닙니다");
+        checkId(userId, check_userId, "userId : 해당 댓글의 작성자가 아닙니다");
         Schedule schedule = scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
         Long check_scheduleId = comment.getComment_schedule().getScheduleId();
-        checkId(scheduleId, check_scheduleId, "해당 게시글의 댓글이 아닙니다");
+        checkId(scheduleId, check_scheduleId, "commentId : 해당 일정의 댓글이 아닙니다");
         User user = userRepo.findById(userId).get();
         schedule.removeComment(comment);
         user.removeComment(comment);
@@ -143,10 +143,10 @@ public class JpaCommonEntityService implements CommonEntityService {
     public CommentResponseDto modifyComment(CommentSaveRequestDto dto, Long userId, Long scheduleId, Long commentId) {
         Comment comment = commentRepo.findOrThrow(commentId, Comment.class.getSimpleName());
         Long check_userId = comment.getComment_user().getUserId();
-        checkId(userId, check_userId, "해당 댓글의 주인이 아닙니다");
+        checkId(userId, check_userId, "userId : 해당 댓글의 작성자가 아닙니다");
         scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
         Long check_scheduleId = comment.getComment_schedule().getScheduleId();
-        checkId(scheduleId, check_scheduleId, "해당 게시글의 댓글이 아닙니다");
+        checkId(scheduleId, check_scheduleId, "commentId : 해당 일정의 댓글이 아닙니다");
         comment.setMention(dto.getMention());
         User user = userRepo.findById(userId).get();
         return modelMapper.map(comment, CommentResponseDto.class)

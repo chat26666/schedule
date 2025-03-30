@@ -9,7 +9,7 @@ public interface BaseRepository<T,ID> extends JpaRepository<T,ID> {
     default T findOrThrow(ID id, String entityName) {
         return findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "해당 " + entityName + " 이(가) 존재하지 않습니다."));
+                        HttpStatus.NOT_FOUND, entityName.toLowerCase() + "Id : " + "해당 " + entityName.toLowerCase() +  " 이(가) 존재하지 않습니다"));
     }
 }
 
