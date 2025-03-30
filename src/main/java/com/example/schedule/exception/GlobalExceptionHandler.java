@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
         ErrorResponseDto dto = ErrorResponseDto.builder()
                 .timestamp(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()))
                 .status(statusCode.value())
-                .message(message)
+                .error(message)
                 .path(request.getRequestURI())
                 .fieldErrors(errorList)
                 .build();
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException ex, HttpServletRequest request) {
         List<String> errorList = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getField() + " : " + error.getDefaultMessage()).toList();
-        return buildErrorResponse(request, HttpStatus.BAD_REQUEST, "VALIDATION FAILED", errorList);
+        return buildErrorResponse(request, HttpStatus.BAD_REQUEST, "Validation Failed", errorList);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
                     return lastPath + " : " + violation.getMessage();
                 })
                 .toList();
-        return buildErrorResponse(request, HttpStatus.BAD_REQUEST, "VALIDATION FAILED", errorList);
+        return buildErrorResponse(request, HttpStatus.BAD_REQUEST, "Validation Failed", errorList);
     }
 
     @ExceptionHandler(ResponseStatusException.class)
@@ -62,13 +62,13 @@ public class GlobalExceptionHandler {
         String message;
         switch (statusCode.value()) {
             case 401:
-                message = "AUTHENTICATION FAILED";
+                message = "Authentication Failed";
                 break;
             case 403:
-                message = "ACCESS DENIED";
+                message = "Access Denied";
                 break;
             default:
-                message = "NOT FOUND";
+                message = "Not Found";
                 break;
         }
         return buildErrorResponse(request, ex.getStatusCode(), message,
@@ -80,6 +80,6 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
         String error = ex.getName() + " : " + ex.getRequiredType().getSimpleName() + " 타입의 값을 입력해주십시오";
         List<String> errorList = new ArrayList<>(List.of(error));
-        return buildErrorResponse(request, HttpStatus.BAD_REQUEST, "TYPE MISMATCH", errorList);
+        return buildErrorResponse(request, HttpStatus.BAD_REQUEST, "Type Mismatch", errorList);
     }
 }

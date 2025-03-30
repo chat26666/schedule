@@ -33,7 +33,7 @@ public class LoginFilter implements Filter {
             String formattedTimestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date());
             errorBody.put("timestamp", formattedTimestamp);
             errorBody.put("status", HttpStatus.UNAUTHORIZED.value());
-            errorBody.put("message", "UNAUTHORIZED");
+            errorBody.put("error", "Unauthorized");
             errorBody.put("path", httpRequest.getRequestURI());
             errorBody.put("fieldErrors", List.of("message : 로그인이 필요합니다"));
             String errorJson = objectMapper.writeValueAsString(errorBody);

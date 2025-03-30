@@ -10,9 +10,12 @@ public class UserSaveRequestDto {
     @NotBlank(message = "이름은 필수 입력값입니다")
     @Size(max = 40, message = "이름 최대 길이는 40글자 이하로만 가능합니다")
     private String name;
+
     @NotBlank(message = "이메일은 필수 입력값입니다")
     @Size(max = 70, message = "이메일 최대 길이는 70글자 이하로만 가능합니다")
+
     private String email;
+
     @NotBlank(message = "비밀번호는 필수 입력값입니다")
     @Pattern(
             regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()\\-_=+{};:,<.>]).{8,}$",
