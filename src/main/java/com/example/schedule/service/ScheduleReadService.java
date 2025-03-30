@@ -8,6 +8,6 @@ import java.util.List;
 public interface ScheduleReadService {
     List<CommentResponseDto> findScheduleComment(Long scheduleId);
     List<ScheduleResponseDto> findScheduleAll(Long userId,Integer page,Integer size);
-    ScheduleResponseDto findScheduleOne(Long userId, Long scheduleId);
+    ScheduleResponseDto findScheduleOne(Long userId, Long scheduleId, boolean isMySchedule);
     UserCommentInfoResponseDto findUserComment(Long userId);
 }

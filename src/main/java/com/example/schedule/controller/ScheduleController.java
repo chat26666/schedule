@@ -52,7 +52,7 @@ public class ScheduleController {
             @PathVariable @Min(value = 1, message = "일정 ID 최소값은 1 이상이어야 합니다") Long scheduleId,
             HttpSession session) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(joinService.findScheduleOne(SessionHelper.getUserId(session), scheduleId));
+                .body(joinService.findScheduleOne(SessionHelper.getUserId(session), scheduleId,true));
     }
 
     @PutMapping("/{scheduleId}")

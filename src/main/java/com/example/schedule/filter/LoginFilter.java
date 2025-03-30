@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LoginFilter implements Filter {
@@ -32,9 +33,9 @@ public class LoginFilter implements Filter {
             String formattedTimestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date());
             errorBody.put("timestamp", formattedTimestamp);
             errorBody.put("status", HttpStatus.UNAUTHORIZED.value());
-            errorBody.put("error", "UNAUTHORIZED");
-            errorBody.put("message", "로그인이 필요합니다");
+            errorBody.put("message", "UNAUTHORIZED");
             errorBody.put("path", httpRequest.getRequestURI());
+            errorBody.put("fieldErrors", List.of("message : 로그인이 필요합니다"));
             String errorJson = objectMapper.writeValueAsString(errorBody);
             response.getWriter().write(errorJson);
         }

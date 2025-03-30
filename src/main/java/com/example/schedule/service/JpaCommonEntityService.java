@@ -94,7 +94,7 @@ public class JpaCommonEntityService implements CommonEntityService {
         checkId(userId, check_userId, "userId : 해당 일정의 작성자가 아닙니다");
         schedule.setTitle(dto.getTitle()).setPlan(dto.getPlan());
         scheduleRepo.flush();
-        return joinService.findScheduleOne(userId, scheduleId);
+        return joinService.findScheduleOne(userId, scheduleId, true);
     }
 
     @Transactional

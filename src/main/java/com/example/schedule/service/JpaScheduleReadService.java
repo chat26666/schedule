@@ -69,11 +69,13 @@ public class JpaScheduleReadService implements ScheduleReadService {
 
     @Transactional
     @Override
-    public ScheduleResponseDto findScheduleOne(Long userId, Long scheduleId) {
+    public ScheduleResponseDto findScheduleOne(Long userId, Long scheduleId, boolean isMySchedule) {
+        final String message;
+        if (isMySchedule) message = "scheduleId : 해당 schedule 이(가) 존재하지 않습니다";
+        else message = "message : userId 및 scheduleId 가 올바른지 확인해주십시오";
         Schedule schedule = scheduleRepo.scheduleFindByScheduleId(userId, scheduleId)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "scheduleId : 해당 schedule 이(가) 존재하지 않습니다 올바른 user 인지 혹은 scheduleId 를 확인해주십시오"));
+                        HttpStatus.NOT_FOUND, message));
         return convertToScheduleResponseDto(schedule);
     }
 

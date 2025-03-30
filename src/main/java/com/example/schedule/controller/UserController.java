@@ -77,7 +77,7 @@ public class UserController {
     public ResponseEntity<ScheduleResponseDto> findScheduleOne(
             @PathVariable @Min(value = 1, message = "유저 ID 최소값은 1 이상이어야 합니다") Long userId,
             @PathVariable @Min(value = 1, message = "일정 ID 최소값은 1 이상이어야 합니다") Long scheduleId) {
-        return ResponseEntity.status(HttpStatus.OK).body(joinService.findScheduleOne(userId, scheduleId));
+        return ResponseEntity.status(HttpStatus.OK).body(joinService.findScheduleOne(userId, scheduleId,false));
     }
 
     @GetMapping("/{userId}/comments")
