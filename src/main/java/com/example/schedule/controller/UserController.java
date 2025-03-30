@@ -84,4 +84,9 @@ public class UserController {
             @PathVariable @Min(value = 1, message = "유저 ID 최소값은 1 이상이어야 합니다") Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(joinService.findUserComment(userId));
     }
+
+    @GetMapping
+    public ResponseEntity<List<UserInfoResponseDto>> findAllUser() {
+        return ResponseEntity.status(HttpStatus.OK).body(joinService.findAllUser());
+    }
 }

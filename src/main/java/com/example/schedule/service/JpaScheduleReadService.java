@@ -2,6 +2,7 @@ package com.example.schedule.service;
 import com.example.schedule.dto.CommentResponseDto;
 import com.example.schedule.dto.ScheduleResponseDto;
 import com.example.schedule.dto.UserCommentInfoResponseDto;
+import com.example.schedule.dto.UserInfoResponseDto;
 import com.example.schedule.entity.Comment;
 import com.example.schedule.entity.Schedule;
 import com.example.schedule.entity.User;
@@ -44,6 +45,12 @@ public class JpaScheduleReadService implements ScheduleReadService {
             scheduleDto.getComment().add(commentDto);
         }
         return scheduleDto;
+    }
+
+    @Transactional
+    @Override
+    public List<UserInfoResponseDto> findAllUser() {
+        return userRepo.findAllUser();
     }
 
     @Transactional
