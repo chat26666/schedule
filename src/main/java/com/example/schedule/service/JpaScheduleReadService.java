@@ -120,7 +120,7 @@ public class JpaScheduleReadService implements ScheduleReadService {
     @Transactional(readOnly = true)
     @Override
     public UserCommentInfoResponseDto findUserComment(Long userId) {
-        User user = userRepo.CommentFindByUser(userId)
+        User user = userRepo.commentFindByUser(userId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "userId : 해당 user 이(가) 존재하지 않습니다"));

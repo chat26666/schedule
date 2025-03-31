@@ -12,10 +12,10 @@ import java.util.Optional;
 public interface UserRepository extends BaseRepository<User,Long> {
 
     @Query("SELECT DISTINCT u FROM User u " +
-            "JOIN FETCH u.Comments c " +
+            "LEFT JOIN FETCH u.Comments c " +
             "WHERE u.userId = :userId " +
             "ORDER BY c.createdAt DESC")
-    Optional<User> CommentFindByUser(@Param("userId") Long userId);
+    Optional<User> commentFindByUser(@Param("userId") Long userId);
 
     @Query("SELECT new com.example.schedule.dto.UserInfoResponseDto(" +
             "u.userId, u.name, u.email, u.createdAt, u.updatedAt) " +
