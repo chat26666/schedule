@@ -5,9 +5,6 @@ public class SessionHelper {
 
     public static Long getUserId(HttpSession session) {
         Object sessionUserId = session.getAttribute("userId");
-        if (sessionUserId instanceof Long) {
-            return (Long) sessionUserId;
-        }
-        return null;
+        return (Long) sessionUserId;
     }
 }
