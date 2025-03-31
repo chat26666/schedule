@@ -20,7 +20,7 @@ import java.util.List;
 public class CommentController {
 
     private final CommonEntityService commonService;
-    private final ScheduleReadService joinService;
+    private final ScheduleReadService readService;
 
     @PostMapping
     public ResponseEntity<CommentResponseDto> createComment(
@@ -54,6 +54,6 @@ public class CommentController {
     public ResponseEntity<List<CommentResponseDto>> findScheduleComment(
             @PathVariable @Min(value = 1, message = "일정 ID 최소값은 1 이상이어야 합니다") Long scheduleId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(joinService.findScheduleComment(scheduleId));
+                .body(readService.findScheduleComment(scheduleId));
     }
 }

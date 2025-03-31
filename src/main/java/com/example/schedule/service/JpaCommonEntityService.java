@@ -27,19 +27,11 @@ public class JpaCommonEntityService implements CommonEntityService {
     private final ScheduleRepository scheduleRepo;
     private final UserRepository userRepo;
     private final ModelMapper modelMapper;
-    private final ScheduleReadService joinService;
+    private final ScheduleReadService readService;
 
     private void checkId(Long session_id, Long id, String message) {
         if (!session_id.equals(id))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, message);
-    }
-
-    @Transactional
-    @Override
-    public void authUser(UserAuthRequestDto dto) {
-        User user = userRepo.findOrThrow(dto.getUserId(), User.class.getSimpleName());
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword()))
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "password : 비밀번호가 틀렸습니다");
     }
 
     @Transactional
@@ -54,7 +46,7 @@ public class JpaCommonEntityService implements CommonEntityService {
     @Transactional
     @Override
     public void deleteUser(UserAuthRequestDto dto, Long userId) {
-        authUser(dto);
+        readService.authUser(dto);
         userRepo.deleteById(dto.getUserId());
     }
 
@@ -65,15 +57,8 @@ public class JpaCommonEntityService implements CommonEntityService {
                 .setName(dto.getName())
                 .setEmail(dto.getEmail());
         userRepo.flush();
-        return modelMapper.map(user, UserInfoResponseDto.class);
+        return readService.findUser(userId);
         // 플러시를 안해주면 Dto 에 수정시간이 반영되지 않음
-    }
-
-    @Transactional
-    @Override
-    public UserInfoResponseDto findUser(Long userId) {
-        User user = userRepo.findOrThrow(userId, User.class.getSimpleName());
-        return modelMapper.map(user, UserInfoResponseDto.class);
     }
 
     @Transactional
@@ -82,8 +67,7 @@ public class JpaCommonEntityService implements CommonEntityService {
         Schedule schedule = modelMapper.map(dto, Schedule.class);
         User user = userRepo.findById(userId).get();
         user.addSchedule(schedule);
-        return modelMapper.map(scheduleRepo.save(schedule), ScheduleResponseDto.class)
-                .setName(user.getName());
+        return readService.findScheduleOne(userId, scheduleRepo.save(schedule).getScheduleId(), true);
     }
 
     @Transactional
@@ -94,7 +78,7 @@ public class JpaCommonEntityService implements CommonEntityService {
         checkId(userId, check_userId, "userId : 해당 일정의 작성자가 아닙니다");
         schedule.setTitle(dto.getTitle()).setPlan(dto.getPlan());
         scheduleRepo.flush();
-        return joinService.findScheduleOne(userId, scheduleId, true);
+        return readService.findScheduleOne(userId, scheduleId, true);
     }
 
     @Transactional
@@ -118,9 +102,7 @@ public class JpaCommonEntityService implements CommonEntityService {
                 .setComment_user(user);
         user.addComment(comment);
         schedule.addComment(comment);
-        return modelMapper.map(commentRepo.save(comment), CommentResponseDto.class)
-                .setUserId(user.getUserId())
-                .setName(user.getName());
+        return readService.findComment(scheduleId,commentRepo.save(comment).getCommentId());
     }
 
     @Transactional
@@ -148,9 +130,7 @@ public class JpaCommonEntityService implements CommonEntityService {
         Long check_scheduleId = comment.getComment_schedule().getScheduleId();
         checkId(scheduleId, check_scheduleId, "commentId : 해당 일정의 댓글이 아닙니다");
         comment.setMention(dto.getMention());
-        User user = userRepo.findById(userId).get();
-        return modelMapper.map(comment, CommentResponseDto.class)
-                .setName(user.getName())
-                .setUserId(user.getUserId());
+        commentRepo.flush();
+        return readService.findComment(scheduleId, commentId);
     }
 }

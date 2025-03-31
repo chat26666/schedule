@@ -1,15 +1,12 @@
 package com.example.schedule.service;
-import com.example.schedule.dto.CommentResponseDto;
-import com.example.schedule.dto.ScheduleResponseDto;
-import com.example.schedule.dto.UserCommentInfoResponseDto;
-import com.example.schedule.dto.UserInfoResponseDto;
+import com.example.schedule.config.PasswordEncoder;
+import com.example.schedule.dto.*;
 import com.example.schedule.entity.Comment;
 import com.example.schedule.entity.Schedule;
 import com.example.schedule.entity.User;
 import com.example.schedule.repository.CommentRepository;
 import com.example.schedule.repository.ScheduleRepository;
 import com.example.schedule.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -21,8 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
-
-// 서비스 클래스의 코드가 방대해지고, 여러 테이블 조인 및 뷰 구성을 위한 로직이 복잡해져 이를 별도의 클래스로 분리하여 관리합니다
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +28,7 @@ public class JpaScheduleReadService implements ScheduleReadService {
     private final ScheduleRepository scheduleRepo;
     private final UserRepository userRepo;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 
     private ScheduleResponseDto convertToScheduleResponseDto(Schedule schedule) {
         ScheduleResponseDto scheduleDto = modelMapper.map(schedule, ScheduleResponseDto.class)
@@ -49,8 +46,23 @@ public class JpaScheduleReadService implements ScheduleReadService {
 
     @Transactional
     @Override
+    public void authUser(UserAuthRequestDto dto) {
+        User user = userRepo.findOrThrow(dto.getUserId(), User.class.getSimpleName());
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword()))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "password : 비밀번호가 틀렸습니다");
+    }
+
+    @Transactional
+    @Override
     public List<UserInfoResponseDto> findAllUser() {
         return userRepo.findAllUser();
+    }
+
+    @Transactional
+    @Override
+    public UserInfoResponseDto findUser(Long userId) {
+        User user = userRepo.findOrThrow(userId, User.class.getSimpleName());
+        return modelMapper.map(user, UserInfoResponseDto.class);
     }
 
     @Transactional
@@ -58,6 +70,12 @@ public class JpaScheduleReadService implements ScheduleReadService {
     public List<CommentResponseDto> findScheduleComment(Long scheduleId) {
         scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
         return commentRepo.findByScheduleComment(scheduleId);
+    }
+
+    @Transactional
+    @Override
+    public CommentResponseDto findComment(Long scheduleId, Long commentId) {
+        return commentRepo.findComment(scheduleId, commentId);
     }
 
     @Transactional

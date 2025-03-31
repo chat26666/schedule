@@ -2,6 +2,7 @@ package com.example.schedule.controller;
 import com.example.schedule.dto.AuthLogin;
 import com.example.schedule.dto.UserAuthRequestDto;
 import com.example.schedule.service.CommonEntityService;
+import com.example.schedule.service.ScheduleReadService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.groups.Default;
@@ -21,7 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final CommonEntityService commonService;
+    private final ScheduleReadService readService;
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> userLogin(
@@ -32,7 +33,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "already logged in"));
         } else {
-            commonService.authUser(dto);
+            readService.authUser(dto);
             HttpSession session = request.getSession(true);
             session.setAttribute("userId", dto.getUserId());
             return ResponseEntity.status(HttpStatus.OK)

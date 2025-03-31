@@ -26,7 +26,7 @@ import java.util.Map;
 public class UserController {
 
     private final CommonEntityService commonService;
-    private final ScheduleReadService joinService;
+    private final ScheduleReadService readService;
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createUser(
@@ -39,7 +39,7 @@ public class UserController {
             @RequestBody @Validated UserAuthRequestDto dto,
             @PathVariable @Min(value = 1, message = "유저 ID 최소값은 1 이상이어야 합니다") Long userId,
             HttpSession session) {
-        if (!SessionHelper.isUserAuthorized(session, userId) && commonService.findUser(userId) != null)
+        if (!SessionHelper.isUserAuthorized(session, userId) && readService.findUser(userId) != null)
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId : 해당 계정의 변경 권한이 없습니다");
         dto.setUserId(userId);
         commonService.deleteUser(dto, userId);
@@ -52,16 +52,16 @@ public class UserController {
             @RequestBody @Validated UserSaveRequestDto dto,
             @PathVariable @Min(value = 1, message = "유저 ID 최소값은 1 이상이어야 합니다") Long userId,
             HttpSession session) {
-        if (!SessionHelper.isUserAuthorized(session, userId) && commonService.findUser(userId) != null)
+        if (!SessionHelper.isUserAuthorized(session, userId) && readService.findUser(userId) != null)
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId : 해당 계정의 변경 권한이 없습니다");
-        commonService.authUser(RequestConverter.convertToUserAuthRequest(dto, userId));
+        readService.authUser(RequestConverter.convertToUserAuthRequest(dto, userId));
         return new ResponseEntity<>(commonService.modifyUser(dto, userId), HttpStatus.OK);
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserInfoResponseDto> findUser(
             @PathVariable @Min(value = 1, message = "유저 ID 최소값은 1 이상이어야 합니다") Long userId) {
-        return new ResponseEntity<>(commonService.findUser(userId), HttpStatus.OK);
+        return new ResponseEntity<>(readService.findUser(userId), HttpStatus.OK);
     }
 
     @GetMapping("/{userId}/schedules")
@@ -69,24 +69,24 @@ public class UserController {
             @PathVariable @Min(value = 1, message = "유저 ID 최소값은 1 이상이어야 합니다") Long userId,
             @RequestParam(defaultValue = "1") @Min(value = 1, message = "최소값은 1 이상이어야 합니다") Integer page,
             @RequestParam(defaultValue = "10") @Min(value = 1, message = "최소값은 1 이상이어야 합니다") Integer size) {
-        return ResponseEntity.status(HttpStatus.OK).body(joinService.findScheduleAll(userId, page - 1, size));
+        return ResponseEntity.status(HttpStatus.OK).body(readService.findScheduleAll(userId, page - 1, size));
     }
 
     @GetMapping("/{userId}/schedules/{scheduleId}")
     public ResponseEntity<ScheduleResponseDto> findScheduleOne(
             @PathVariable @Min(value = 1, message = "유저 ID 최소값은 1 이상이어야 합니다") Long userId,
             @PathVariable @Min(value = 1, message = "일정 ID 최소값은 1 이상이어야 합니다") Long scheduleId) {
-        return ResponseEntity.status(HttpStatus.OK).body(joinService.findScheduleOne(userId, scheduleId,false));
+        return ResponseEntity.status(HttpStatus.OK).body(readService.findScheduleOne(userId, scheduleId,false));
     }
 
     @GetMapping("/{userId}/comments")
     public ResponseEntity<UserCommentInfoResponseDto> findUserComment(
             @PathVariable @Min(value = 1, message = "유저 ID 최소값은 1 이상이어야 합니다") Long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(joinService.findUserComment(userId));
+        return ResponseEntity.status(HttpStatus.OK).body(readService.findUserComment(userId));
     }
 
     @GetMapping
     public ResponseEntity<List<UserInfoResponseDto>> findAllUser() {
-        return ResponseEntity.status(HttpStatus.OK).body(joinService.findAllUser());
+        return ResponseEntity.status(HttpStatus.OK).body(readService.findAllUser());
     }
 }

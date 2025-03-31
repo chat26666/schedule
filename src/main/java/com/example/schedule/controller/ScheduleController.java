@@ -20,7 +20,7 @@ import java.util.List;
 public class ScheduleController {
 
     private final CommonEntityService commonService;
-    private final ScheduleReadService joinService;
+    private final ScheduleReadService readService;
 
     @PostMapping
     public ResponseEntity<ScheduleResponseDto> createSchedule(
@@ -44,7 +44,7 @@ public class ScheduleController {
             @RequestParam(defaultValue = "1") @Min(value = 1, message = "최소값은 1 이상이어야 합니다") Integer page,
             @RequestParam(defaultValue = "10") @Min(value = 1, message = "최소값은 1 이상이어야 합니다") Integer size) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(joinService.findScheduleAll(SessionHelper.getUserId(session), page - 1, size));
+                .body(readService.findScheduleAll(SessionHelper.getUserId(session), page - 1, size));
     }
 
     @GetMapping("/{scheduleId}")
@@ -52,7 +52,7 @@ public class ScheduleController {
             @PathVariable @Min(value = 1, message = "일정 ID 최소값은 1 이상이어야 합니다") Long scheduleId,
             HttpSession session) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(joinService.findScheduleOne(SessionHelper.getUserId(session), scheduleId,true));
+                .body(readService.findScheduleOne(SessionHelper.getUserId(session), scheduleId,true));
     }
 
     @PutMapping("/{scheduleId}")

@@ -17,6 +17,16 @@ public interface CommentRepository extends BaseRepository<Comment,Long>  {
             "WHERE s.scheduleId = :scheduleId " +
             "ORDER BY c.createdAt ASC")
     List<CommentResponseDto> findByScheduleComment(@Param("scheduleId") Long scheduleId);
+
+    @Query("SELECT new com.example.schedule.dto.CommentResponseDto(" +
+            "c.commentId, u.userId, u.name, c.mention, c.createdAt, c.updatedAt) " +
+            "FROM Comment c " +
+            "JOIN c.comment_user u " +
+            "JOIN c.comment_schedule s " +
+            "WHERE s.scheduleId = :scheduleId " +
+            "AND c.commentId = :commentId")
+    CommentResponseDto findComment(@Param("scheduleId")Long scheduleId, @Param("commentId")Long commentId);
+
 }
 
 //Join 해서 DTO 형태로 한번에 셀렉합니다
