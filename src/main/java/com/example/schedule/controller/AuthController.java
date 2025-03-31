@@ -1,7 +1,6 @@
 package com.example.schedule.controller;
 import com.example.schedule.dto.AuthLogin;
 import com.example.schedule.dto.UserAuthRequestDto;
-import com.example.schedule.service.CommonEntityService;
 import com.example.schedule.service.ScheduleReadService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
