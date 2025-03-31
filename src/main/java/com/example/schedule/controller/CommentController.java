@@ -27,8 +27,9 @@ public class CommentController {
             @RequestBody @Validated CommentSaveRequestDto dto,
             @PathVariable @Min(value = 1, message = "일정 ID 최소값은 1 이상이어야 합니다") Long scheduleId,
             HttpSession session) {
+        Long commentId = commonService.createComment(dto, SessionHelper.getUserId(session), scheduleId);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(commonService.createComment(dto, SessionHelper.getUserId(session), scheduleId));
+                .body(readService.findComment(scheduleId, commentId));
     }
 
     @DeleteMapping("/{commentId}")
@@ -46,8 +47,9 @@ public class CommentController {
             @PathVariable @Min(value = 1, message = "일정 ID 최소값은 1 이상이어야 합니다") Long scheduleId,
             @PathVariable @Min(value = 1, message = "댓글 ID 최소값은 1 이상이어야 합니다") Long commentId,
             HttpSession session) {
+        commonService.modifyComment(dto, SessionHelper.getUserId(session), scheduleId, commentId);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(commonService.modifyComment(dto, SessionHelper.getUserId(session), scheduleId, commentId));
+                .body(readService.findComment(scheduleId, commentId));
     }
 
     @GetMapping

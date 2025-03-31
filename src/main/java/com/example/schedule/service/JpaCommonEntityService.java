@@ -5,6 +5,7 @@ import com.example.schedule.dto.*;
 import com.example.schedule.entity.Comment;
 import com.example.schedule.entity.Schedule;
 import com.example.schedule.entity.User;
+import com.example.schedule.entity.ValidationIdChecker;
 import com.example.schedule.repository.CommentRepository;
 import com.example.schedule.repository.ScheduleRepository;
 import com.example.schedule.repository.UserRepository;
@@ -27,12 +28,14 @@ public class JpaCommonEntityService implements CommonEntityService {
     private final ScheduleRepository scheduleRepo;
     private final UserRepository userRepo;
     private final ModelMapper modelMapper;
-    private final ScheduleReadService readService;
 
-    private void checkId(Long session_id, Long id, String message) {
-        if (!session_id.equals(id))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, message);
+    private <T extends ValidationIdChecker> void validateOwnership(Long id, T instance) {
+        String errorMessage = instance.validateOwnership(id);
+        if (errorMessage != null)
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
     }
+
+    //해당 자원의 작성자 Id가  현재 접속한 유저의 userId 와 동일한지 혹은 해당 댓글이 이 게시글에 속한지를 점검합니다
 
     @Transactional
     @Override
@@ -46,47 +49,41 @@ public class JpaCommonEntityService implements CommonEntityService {
     @Transactional
     @Override
     public void deleteUser(UserAuthRequestDto dto, Long userId) {
-        readService.authUser(dto);
         userRepo.deleteById(dto.getUserId());
     }
 
     @Transactional
     @Override
-    public UserInfoResponseDto modifyUser(UserSaveRequestDto dto, Long userId) {
-        User user = userRepo.findById(userId).get()
+    public void modifyUser(UserSaveRequestDto dto, Long userId) {
+        userRepo.findById(userId).get()
                 .setName(dto.getName())
                 .setEmail(dto.getEmail());
-        userRepo.flush();
-        return readService.findUser(userId);
-        // 플러시를 안해주면 Dto 에 수정시간이 반영되지 않음
     }
 
     @Transactional
     @Override
-    public ScheduleResponseDto createSchedule(ScheduleSaveRequestDto dto, Long userId) {
+    public Long createSchedule(ScheduleSaveRequestDto dto, Long userId) {
         Schedule schedule = modelMapper.map(dto, Schedule.class);
         User user = userRepo.findById(userId).get();
         user.addSchedule(schedule);
-        return readService.findScheduleOne(userId, scheduleRepo.save(schedule).getScheduleId(), true);
+        return scheduleRepo.save(schedule).getScheduleId();
     }
+
+    //연관관계 설정을 위해서 User 객체를 find 합니다
 
     @Transactional
     @Override
-    public ScheduleResponseDto modifySchedule(ScheduleSaveRequestDto dto, Long userId, Long scheduleId) {
+    public void modifySchedule(ScheduleSaveRequestDto dto, Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
-        Long check_userId = schedule.getSchedule_user().getUserId();
-        checkId(userId, check_userId, "userId : 해당 일정의 작성자가 아닙니다");
+        validateOwnership(userId,schedule.getSchedule_user());
         schedule.setTitle(dto.getTitle()).setPlan(dto.getPlan());
-        scheduleRepo.flush();
-        return readService.findScheduleOne(userId, scheduleId, true);
     }
 
     @Transactional
     @Override
     public void deleteSchedule(Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
-        Long check_userId = schedule.getSchedule_user().getUserId();
-        checkId(userId, check_userId, "userId : 해당 일정의 작성자가 아닙니다");
+        validateOwnership(userId,schedule.getSchedule_user());
         User user = userRepo.findById(userId).get();
         user.removeSchedule(schedule);
         scheduleRepo.deleteById(scheduleId);
@@ -94,7 +91,7 @@ public class JpaCommonEntityService implements CommonEntityService {
 
     @Transactional
     @Override
-    public CommentResponseDto createComment(CommentSaveRequestDto dto, Long userId, Long scheduleId) {
+    public Long createComment(CommentSaveRequestDto dto, Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
         User user = userRepo.findById(userId).get();
         Comment comment = modelMapper.map(dto, Comment.class)
@@ -102,18 +99,16 @@ public class JpaCommonEntityService implements CommonEntityService {
                 .setComment_user(user);
         user.addComment(comment);
         schedule.addComment(comment);
-        return readService.findComment(scheduleId,commentRepo.save(comment).getCommentId());
+        return commentRepo.save(comment).getCommentId();
     }
 
     @Transactional
     @Override
     public void deleteComment(Long userId, Long scheduleId, Long commentId) {
         Comment comment = commentRepo.findOrThrow(commentId, Comment.class.getSimpleName());
-        Long check_userId = comment.getComment_user().getUserId();
-        checkId(userId, check_userId, "userId : 해당 댓글의 작성자가 아닙니다");
         Schedule schedule = scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
-        Long check_scheduleId = comment.getComment_schedule().getScheduleId();
-        checkId(scheduleId, check_scheduleId, "commentId : 해당 일정의 댓글이 아닙니다");
+        validateOwnership(scheduleId,comment.getComment_schedule());
+        validateOwnership(userId,comment.getComment_user());
         User user = userRepo.findById(userId).get();
         schedule.removeComment(comment);
         user.removeComment(comment);
@@ -122,15 +117,11 @@ public class JpaCommonEntityService implements CommonEntityService {
 
     @Transactional
     @Override
-    public CommentResponseDto modifyComment(CommentSaveRequestDto dto, Long userId, Long scheduleId, Long commentId) {
+    public void modifyComment(CommentSaveRequestDto dto, Long userId, Long scheduleId, Long commentId) {
         Comment comment = commentRepo.findOrThrow(commentId, Comment.class.getSimpleName());
-        Long check_userId = comment.getComment_user().getUserId();
-        checkId(userId, check_userId, "userId : 해당 댓글의 작성자가 아닙니다");
         scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
-        Long check_scheduleId = comment.getComment_schedule().getScheduleId();
-        checkId(scheduleId, check_scheduleId, "commentId : 해당 일정의 댓글이 아닙니다");
+        validateOwnership(scheduleId,comment.getComment_schedule());
+        validateOwnership(userId,comment.getComment_user());
         comment.setMention(dto.getMention());
-        commentRepo.flush();
-        return readService.findComment(scheduleId, commentId);
     }
 }

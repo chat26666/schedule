@@ -29,9 +29,9 @@ public class UserController {
     private final ScheduleReadService readService;
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createUser(
+    public ResponseEntity<Map<String, Long>> createUser(
             @RequestBody @Validated UserSaveRequestDto dto) {
-        return new ResponseEntity(commonService.createUser(dto), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(commonService.createUser(dto));
     }
 
     @DeleteMapping("/{userId}")
@@ -42,9 +42,10 @@ public class UserController {
         if (!SessionHelper.isUserAuthorized(session, userId) && readService.findUser(userId) != null)
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId : 해당 계정의 변경 권한이 없습니다");
         dto.setUserId(userId);
+        readService.authUser(dto);
         commonService.deleteUser(dto, userId);
         session.invalidate();
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/{userId}")
@@ -55,13 +56,14 @@ public class UserController {
         if (!SessionHelper.isUserAuthorized(session, userId) && readService.findUser(userId) != null)
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId : 해당 계정의 변경 권한이 없습니다");
         readService.authUser(RequestConverter.convertToUserAuthRequest(dto, userId));
-        return new ResponseEntity<>(commonService.modifyUser(dto, userId), HttpStatus.OK);
+        commonService.modifyUser(dto, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(readService.findUser(userId));
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserInfoResponseDto> findUser(
             @PathVariable @Min(value = 1, message = "유저 ID 최소값은 1 이상이어야 합니다") Long userId) {
-        return new ResponseEntity<>(readService.findUser(userId), HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(readService.findUser(userId));
     }
 
     @GetMapping("/{userId}/schedules")

@@ -23,5 +23,3 @@ public interface UserRepository extends BaseRepository<User,Long> {
             "ORDER BY u.createdAt")
     List<UserInfoResponseDto> findAllUser();
 }
-
-//유저가 쓴 댓글 이력을 전부 조회하는 기능입니다

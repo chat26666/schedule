@@ -44,7 +44,9 @@ public class JpaScheduleReadService implements ScheduleReadService {
         return scheduleDto;
     }
 
-    @Transactional
+    //ResponseDto 로 변경하는 로직이 중복되서 따로 private 메서드로 분리하였습니다
+
+    @Transactional(readOnly = true)
     @Override
     public void authUser(UserAuthRequestDto dto) {
         User user = userRepo.findOrThrow(dto.getUserId(), User.class.getSimpleName());
@@ -52,33 +54,37 @@ public class JpaScheduleReadService implements ScheduleReadService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "password : 비밀번호가 틀렸습니다");
     }
 
-    @Transactional
+    //비밀번호 인증 로직입니다
+
+    @Transactional(readOnly = true)
     @Override
     public List<UserInfoResponseDto> findAllUser() {
         return userRepo.findAllUser();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public UserInfoResponseDto findUser(Long userId) {
         User user = userRepo.findOrThrow(userId, User.class.getSimpleName());
         return modelMapper.map(user, UserInfoResponseDto.class);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public List<CommentResponseDto> findScheduleComment(Long scheduleId) {
         scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
         return commentRepo.findByScheduleComment(scheduleId);
     }
 
-    @Transactional
+    //한 스케쥴의 댓글 전체를 조회합니다
+
+    @Transactional(readOnly = true)
     @Override
     public CommentResponseDto findComment(Long scheduleId, Long commentId) {
         return commentRepo.findComment(scheduleId, commentId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public List<ScheduleResponseDto> findScheduleAll(Long userId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").descending());
@@ -92,7 +98,10 @@ public class JpaScheduleReadService implements ScheduleReadService {
         return dtoList;
     }
 
-    @Transactional
+    //유저 Id 를 기반으로 해당 유저의 일정을 전체 검색합니다
+    //페이지 및 사이즈 지정이 가능하고 미입력시 디폴트 값으로 검사하게 됩니다
+
+    @Transactional(readOnly = true)
     @Override
     public ScheduleResponseDto findScheduleOne(Long userId, Long scheduleId, boolean isMySchedule) {
         final String message;
@@ -104,7 +113,11 @@ public class JpaScheduleReadService implements ScheduleReadService {
         return convertToScheduleResponseDto(schedule);
     }
 
-    @Transactional
+    //일정 1개를 검색하는 메서드이며 예외 발생시 두가지 경우의 수가 있어서 분기 처리하였습니다
+    //로그인 상태로 자기자신의 userId 는 입력하지 않고 스케쥴 Id 로만 검색할 경우
+    //혹은 다른 이의 일정을 검색할 경우 각기 다른 예외를 던집니다
+
+    @Transactional(readOnly = true)
     @Override
     public UserCommentInfoResponseDto findUserComment(Long userId) {
         User user = userRepo.CommentFindByUser(userId)
@@ -119,4 +132,6 @@ public class JpaScheduleReadService implements ScheduleReadService {
         }
         return dto;
     }
+
+    //해당 유저의 전체 댓글 이력을 검색합니다
 }

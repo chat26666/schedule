@@ -8,11 +8,11 @@ public interface CommonEntityService {
 
     Map<String, Long> createUser(UserSaveRequestDto dto);
     void deleteUser(UserAuthRequestDto dto, Long userId);
-    UserInfoResponseDto modifyUser(UserSaveRequestDto dto, Long userId);
-    ScheduleResponseDto createSchedule(ScheduleSaveRequestDto dto, Long userId);
+    void modifyUser(UserSaveRequestDto dto, Long userId);
+    Long createSchedule(ScheduleSaveRequestDto dto, Long userId);
     void deleteSchedule(Long userId, Long scheduleId);
-    CommentResponseDto createComment(CommentSaveRequestDto dto, Long userId, Long scheduleId);
+    Long createComment(CommentSaveRequestDto dto, Long userId, Long scheduleId);
     void deleteComment(Long userId, Long scheduleId, Long commentId);
-    CommentResponseDto modifyComment(CommentSaveRequestDto dto, Long userId, Long scheduleId, Long commentId);
-    ScheduleResponseDto modifySchedule(ScheduleSaveRequestDto dto, Long userId, Long scheduleId);
+    void modifyComment(CommentSaveRequestDto dto, Long userId, Long scheduleId, Long commentId);
+    void modifySchedule(ScheduleSaveRequestDto dto, Long userId, Long scheduleId);
 }

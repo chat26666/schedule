@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class User extends BaseEntity {
+public class User extends BaseEntity implements ValidationIdChecker {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,5 +52,9 @@ public class User extends BaseEntity {
         comment.setComment_user(null);
     }
 
-
+    public String validateOwnership(Long id) {
+        return this.userId.equals(id)
+                ? null
+                : "userId : 해당 자원의 작성자가 아닙니다";
+    }
 }

@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class Schedule extends BaseEntity {
+public class Schedule extends BaseEntity implements ValidationIdChecker {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,4 +44,9 @@ public class Schedule extends BaseEntity {
         comment.setComment_schedule(null);
     }
 
+    public String validateOwnership(Long id) {
+        return this.scheduleId.equals(id)
+                ? null
+                : "userId : 해당 일정의 댓글이 아닙니다";
+    }
 }

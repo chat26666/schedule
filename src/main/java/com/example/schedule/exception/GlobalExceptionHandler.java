@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -81,5 +82,13 @@ public class GlobalExceptionHandler {
         String error = ex.getName() + " : " + ex.getRequiredType().getSimpleName() + " 타입의 값을 입력해주십시오";
         List<String> errorList = new ArrayList<>(List.of(error));
         return buildErrorResponse(request, HttpStatus.BAD_REQUEST, "Type Mismatch", errorList);
+    }
+
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<ErrorResponseDto> handlerSQLIntegrityConstraintViolationException(
+            SQLIntegrityConstraintViolationException ex, HttpServletRequest request) {
+        String error = "email : 이미 중복된 이메일이 존재합니다";
+        List<String> errorList = new ArrayList<>(List.of(error));
+        return buildErrorResponse(request, HttpStatus.CONFLICT, "Data Integrity Constraint Violation", errorList);
     }
 }

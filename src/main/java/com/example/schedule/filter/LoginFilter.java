@@ -43,5 +43,6 @@ public class LoginFilter implements Filter {
     public boolean isBlackList(String requestURI){
         return PatternMatchUtils.simpleMatch(BlackListPath, requestURI);
     }
-
 }
+
+    //로그인이 되었는지 안되었는지 검증하는 필터입니다

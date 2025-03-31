@@ -26,8 +26,9 @@ public class ScheduleController {
     public ResponseEntity<ScheduleResponseDto> createSchedule(
             @RequestBody @Validated ScheduleSaveRequestDto dto,
             HttpSession session) {
+        Long scheduleId = commonService.createSchedule(dto, SessionHelper.getUserId(session));
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(commonService.createSchedule(dto, SessionHelper.getUserId(session)));
+                .body(readService.findScheduleOne(SessionHelper.getUserId(session),scheduleId, true));
     }
 
     @DeleteMapping("/{scheduleId}")
@@ -60,7 +61,8 @@ public class ScheduleController {
             @RequestBody @Validated ScheduleSaveRequestDto dto,
             @PathVariable @Min(value = 1, message = "일정 ID 최소값은 1 이상이어야 합니다") Long scheduleId,
             HttpSession session) {
+        commonService.modifySchedule(dto, SessionHelper.getUserId(session), scheduleId);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(commonService.modifySchedule(dto, SessionHelper.getUserId(session), scheduleId));
+                .body(readService.findScheduleOne(SessionHelper.getUserId(session), scheduleId, true));
     }
 }
