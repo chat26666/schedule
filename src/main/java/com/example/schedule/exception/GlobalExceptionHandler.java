@@ -5,6 +5,8 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -91,4 +93,22 @@ public class GlobalExceptionHandler {
         List<String> errorList = new ArrayList<>(List.of(error));
         return buildErrorResponse(request, HttpStatus.CONFLICT, "Data Integrity Constraint Violation", errorList);
     }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponseDto> handlerHttpMessageNotReadableException(
+            HttpMessageNotReadableException ex, HttpServletRequest request) {
+        String error = "message : 올바른 JSON 형태의 데이터가 아닙니다";
+        List<String> errorList = new ArrayList<>(List.of(error));
+        return buildErrorResponse(request, HttpStatus.BAD_REQUEST, "Invalid JSON format", errorList);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponseDto> handlerHttpMediaTypeNotSupportedException(
+            HttpMediaTypeNotSupportedException ex, HttpServletRequest request) {
+        String error = "message : 지원하지 않는 미디어 타입입니다";
+        List<String> errorList = new ArrayList<>(List.of(error));
+        return buildErrorResponse(request, HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type", errorList);
+    }
+
+
 }
