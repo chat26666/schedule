@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
+import static com.example.schedule.util.SessionHelper.getUserId;
+
 @RestController
 @RequestMapping("/api/auth")
 @Validated
@@ -28,11 +30,11 @@ public class AuthController {
             @RequestBody @Validated({Default.class, AuthLogin.class}) UserAuthRequestDto dto,
             HttpServletRequest request) {
 
-        if (request.getSession(false) != null) {
+        if (request.getSession(false) != null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "already logged in"));
-        } else {
-            readService.authUser(dto);
+        else {
+            readService.validatePassword(dto);
             HttpSession session = request.getSession(true);
             session.setAttribute("userId", dto.getUserId());
             return ResponseEntity.status(HttpStatus.OK)

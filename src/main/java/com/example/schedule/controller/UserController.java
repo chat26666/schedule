@@ -19,6 +19,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.schedule.util.SessionHelper.getUserId;
+
 @RestController
 @Validated
 @RequiredArgsConstructor
@@ -39,11 +41,9 @@ public class UserController {
             @RequestBody @Validated UserAuthRequestDto dto,
             @PathVariable @Min(value = 1, message = "유저 ID 최소값은 1 이상이어야 합니다") Long userId,
             HttpSession session) {
-        if (!SessionHelper.isUserAuthorized(session, userId) && readService.findUser(userId) != null)
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId : 해당 계정의 변경 권한이 없습니다");
         dto.setUserId(userId);
-        readService.authUser(dto);
-        commonService.deleteUser(dto, userId);
+        readService.validatePassword(dto);
+        commonService.deleteUser(userId, SessionHelper.getUserId(session));
         session.invalidate();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -53,10 +53,8 @@ public class UserController {
             @RequestBody @Validated UserSaveRequestDto dto,
             @PathVariable @Min(value = 1, message = "유저 ID 최소값은 1 이상이어야 합니다") Long userId,
             HttpSession session) {
-        if (!SessionHelper.isUserAuthorized(session, userId) && readService.findUser(userId) != null)
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId : 해당 계정의 변경 권한이 없습니다");
-        readService.authUser(RequestConverter.convertToUserAuthRequest(dto, userId));
-        commonService.modifyUser(dto, userId);
+        readService.validatePassword(RequestConverter.convertToUserAuthRequest(dto, userId));
+        commonService.modifyUser(dto, userId, SessionHelper.getUserId(session));
         return ResponseEntity.status(HttpStatus.OK).body(readService.findUser(userId));
     }
 

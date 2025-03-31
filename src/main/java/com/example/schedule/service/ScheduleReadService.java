@@ -13,5 +13,5 @@ public interface ScheduleReadService {
     List<UserInfoResponseDto> findAllUser();
     UserInfoResponseDto findUser(Long userId);
     CommentResponseDto findComment(Long scheduleId, Long commentId);
-    void authUser(UserAuthRequestDto dto);
+    void validatePassword(UserAuthRequestDto dto);
 }

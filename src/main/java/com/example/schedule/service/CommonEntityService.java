@@ -7,8 +7,8 @@ import java.util.Map;
 public interface CommonEntityService {
 
     Map<String, Long> createUser(UserSaveRequestDto dto);
-    void deleteUser(UserAuthRequestDto dto, Long userId);
-    void modifyUser(UserSaveRequestDto dto, Long userId);
+    void deleteUser(Long userId, Long sessionUserId);
+    void modifyUser(UserSaveRequestDto dto, Long userId, Long sessionUserId);
     Long createSchedule(ScheduleSaveRequestDto dto, Long userId);
     void deleteSchedule(Long userId, Long scheduleId);
     Long createComment(CommentSaveRequestDto dto, Long userId, Long scheduleId);

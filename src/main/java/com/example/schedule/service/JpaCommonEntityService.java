@@ -37,6 +37,13 @@ public class JpaCommonEntityService implements CommonEntityService {
 
     //해당 자원의 작성자 Id가  현재 접속한 유저의 userId 와 동일한지 혹은 해당 댓글이 이 게시글에 속한지를 점검합니다
 
+    private void authorizeUser(Long sessionUserId, Long UserId) {
+        if(!UserId.equals(sessionUserId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId : 해당 계정의 변경 권한이 없습니다");
+    }
+
+    //변경 및 삭제전 세션아이디와 @Pathvariable 로 전달된 userId 를 비교합니다
+
     @Transactional
     @Override
     public Map<String, Long> createUser(UserSaveRequestDto dto) {
@@ -48,13 +55,15 @@ public class JpaCommonEntityService implements CommonEntityService {
 
     @Transactional
     @Override
-    public void deleteUser(UserAuthRequestDto dto, Long userId) {
-        userRepo.deleteById(dto.getUserId());
+    public void deleteUser(Long userId, Long sessionUserId) {
+        authorizeUser(sessionUserId,userId);
+        userRepo.deleteById(userId);
     }
 
     @Transactional
     @Override
-    public void modifyUser(UserSaveRequestDto dto, Long userId) {
+    public void modifyUser(UserSaveRequestDto dto, Long userId, Long sessionUserId) {
+        authorizeUser(sessionUserId,userId);
         userRepo.findById(userId).get()
                 .setName(dto.getName())
                 .setEmail(dto.getEmail());
