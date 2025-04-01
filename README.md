@@ -5,7 +5,7 @@
 ### Java 17.0.14<br>
 ### IntelliJ IDEA 2024.3.3<br>
 ### Spring Boot 3.4.4<br>
-### DBMS 설치 환경 CentOS Linux release 7.9.2009<br>
+### DBMS 및 REDIS 설치 환경 CentOS Linux release 7.9.2009<br>
 ### MYSQL 8.0.41 for Linux on x86_64 (MySQL Community Server - GPL)
 ### REDIS 3.2.12 <br><br><br><br>
 
