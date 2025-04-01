@@ -34,15 +34,13 @@ public class JpaCommonEntityService implements CommonEntityService {
         if (errorMessage != null)
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
     }
-
-    //해당 자원의 작성자 Id가  현재 접속한 유저의 userId 와 동일한지 혹은 해당 댓글이 이 게시글에 속한지를 점검합니다
+    // 해당 자원의 작성자 Id가 현재 접속한 유저의 userId와 동일한지 혹은 해당 댓글이 이 게시글에 속한지를 점검합니다.
 
     private void authorizeUser(Long sessionUserId, Long UserId) {
-        if(!UserId.equals(sessionUserId))
+        if (!UserId.equals(sessionUserId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId : 해당 계정의 변경 권한이 없습니다");
     }
-
-    //변경 및 삭제전 세션아이디와 @Pathvariable 로 전달된 userId 를 비교합니다
+    // 변경 및 삭제 전 세션 아이디와 @PathVariable로 전달된 userId를 비교합니다.
 
     @Transactional
     @Override
@@ -56,15 +54,15 @@ public class JpaCommonEntityService implements CommonEntityService {
     @Transactional
     @Override
     public void deleteUser(Long userId, Long sessionUserId) {
-        authorizeUser(sessionUserId,userId);
+        authorizeUser(sessionUserId, userId);
         userRepo.deleteById(userId);
     }
 
     @Transactional
     @Override
     public void modifyUser(UserSaveRequestDto dto, Long userId, Long sessionUserId) {
-        authorizeUser(sessionUserId,userId);
-        userRepo.findById(userId).get()
+        authorizeUser(sessionUserId, userId);
+        userRepo.findOrThrow(userId, User.class.getSimpleName())
                 .setName(dto.getName())
                 .setEmail(dto.getEmail());
     }
@@ -73,18 +71,17 @@ public class JpaCommonEntityService implements CommonEntityService {
     @Override
     public Long createSchedule(ScheduleSaveRequestDto dto, Long userId) {
         Schedule schedule = modelMapper.map(dto, Schedule.class);
-        User user = userRepo.findById(userId).get();
+        User user = userRepo.findOrThrow(userId, User.class.getSimpleName());
         user.addSchedule(schedule);
         return scheduleRepo.save(schedule).getScheduleId();
     }
-
-    //연관관계 설정을 위해서 User 객체를 find 합니다
+    // 연관관계 설정을 위해서 User 객체를 find 합니다.
 
     @Transactional
     @Override
     public void modifySchedule(ScheduleSaveRequestDto dto, Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
-        validateOwnership(userId,schedule.getSchedule_user());
+        validateOwnership(userId, schedule.getSchedule_user());
         schedule.setTitle(dto.getTitle()).setPlan(dto.getPlan());
     }
 
@@ -92,8 +89,8 @@ public class JpaCommonEntityService implements CommonEntityService {
     @Override
     public void deleteSchedule(Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
-        validateOwnership(userId,schedule.getSchedule_user());
-        User user = userRepo.findById(userId).get();
+        validateOwnership(userId, schedule.getSchedule_user());
+        User user = userRepo.findOrThrow(userId, User.class.getSimpleName());
         user.removeSchedule(schedule);
         scheduleRepo.deleteById(scheduleId);
     }
@@ -102,7 +99,7 @@ public class JpaCommonEntityService implements CommonEntityService {
     @Override
     public Long createComment(CommentSaveRequestDto dto, Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
-        User user = userRepo.findById(userId).get();
+        User user = userRepo.findOrThrow(userId, User.class.getSimpleName());
         Comment comment = modelMapper.map(dto, Comment.class)
                 .setComment_schedule(schedule)
                 .setComment_user(user);
@@ -116,9 +113,9 @@ public class JpaCommonEntityService implements CommonEntityService {
     public void deleteComment(Long userId, Long scheduleId, Long commentId) {
         Comment comment = commentRepo.findOrThrow(commentId, Comment.class.getSimpleName());
         Schedule schedule = scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
-        validateOwnership(scheduleId,comment.getComment_schedule());
-        validateOwnership(userId,comment.getComment_user());
-        User user = userRepo.findById(userId).get();
+        validateOwnership(scheduleId, comment.getComment_schedule());
+        validateOwnership(userId, comment.getComment_user());
+        User user = userRepo.findOrThrow(userId, User.class.getSimpleName());
         schedule.removeComment(comment);
         user.removeComment(comment);
         commentRepo.deleteById(commentId);
@@ -129,8 +126,8 @@ public class JpaCommonEntityService implements CommonEntityService {
     public void modifyComment(CommentSaveRequestDto dto, Long userId, Long scheduleId, Long commentId) {
         Comment comment = commentRepo.findOrThrow(commentId, Comment.class.getSimpleName());
         scheduleRepo.findOrThrow(scheduleId, Schedule.class.getSimpleName());
-        validateOwnership(scheduleId,comment.getComment_schedule());
-        validateOwnership(userId,comment.getComment_user());
+        validateOwnership(scheduleId, comment.getComment_schedule());
+        validateOwnership(userId, comment.getComment_user());
         comment.setMention(dto.getMention());
     }
 }
